@@ -1,13 +1,12 @@
 import { ArrowRight } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
-
 const Hero = () => {
     return (
         <section
             className="relative w-full min-h-screen bg-cover bg-center"
             style={{
-                backgroundImage: "url('src/assets/veg.png')",
+                backgroundImage: `url(/images/veg.png)`,
             }}
         >
             {/* Optional overlay for readability */}

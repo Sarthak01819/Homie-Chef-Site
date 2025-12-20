@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
 const Navbar = () => {
   const [open, setOpen] = useState(false);
 
@@ -20,7 +19,7 @@ const Navbar = () => {
         <Link to="/">
           <img
             className="h-10 sm:h-12 w-auto"
-            src="src/assets/removed-bg-logo.png"
+            src={"/images/removed-bg-logo.png"}
             alt="Logo"
           />
         </Link>

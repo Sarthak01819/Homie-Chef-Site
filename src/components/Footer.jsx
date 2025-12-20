@@ -13,7 +13,7 @@ const Footer = () => {
       <div className=" max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <img
-            src="src/assets/removed-bg-logo.png"
+            src={"/images/removed-bg-logo.png"}
             alt="Homie Chef Logo"
             className="h-12 w-auto"
           />

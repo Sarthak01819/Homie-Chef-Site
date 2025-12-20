@@ -23,7 +23,7 @@ const dishes = [
         id: 2,
         name: "Paneer Steak",
         price: "₹220",
-        img: "src/assets/paneer-steak.png",
+        img: "/images/paneer-steak.png",
     },
     {
         id: 3,
