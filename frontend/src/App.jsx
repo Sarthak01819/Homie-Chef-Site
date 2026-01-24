@@ -24,6 +24,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import Tracker from "./pages/Tracker";
 
 /* =========================
    PAGE ANIMATION CONFIG
@@ -56,7 +57,7 @@ function App() {
   const location = useLocation();
 
   return (
-    <div className="App min-h-screen" style={{ backgroundColor: "#FFFFFF" }}>
+    <div className="App min-h-screen " style={{ backgroundColor: "#FFFFFF" }}>
       <Navbar />
 
       <AnimatePresence mode="wait">
@@ -208,6 +209,14 @@ function App() {
                 <AnimatedPage>
                   <ActiveSubscription />
                 </AnimatedPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tracker"
+            element={
+              <ProtectedRoute>
+                <Tracker />
               </ProtectedRoute>
             }
           />

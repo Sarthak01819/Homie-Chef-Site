@@ -71,10 +71,10 @@ const Favourites = () => {
 
     return (
         <motion.div 
-        className="min-h-screen bg-green-800/80 py-24"
+        className="min-h-screen bg-linear-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] py-24"
         >
             <motion.div
-                className="max-w-6xl mx-auto px-5 py-10 bg-green-100/50 rounded-2xl mt-24 shadow-2xl"
+                className="max-w-6xl mx-auto px-5 py-10 bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 backdrop-blur-2xl rounded-2xl mt-24 shadow-2xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}

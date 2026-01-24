@@ -125,10 +125,16 @@ const MealCard = ({ meal }) => {
 
   return (
     <motion.div
-      className="rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative border-2"
-      style={{ backgroundColor: '#F9F9F9', borderColor: '#CCCCCC' }}
-      onMouseEnter={(e) => e.currentTarget.style.borderColor = '#235E3A'}
-      onMouseLeave={(e) => e.currentTarget.style.borderColor = '#CCCCCC'}
+      className="
+    rounded-2xl shadow-lg overflow-hidden hover:shadow-xl
+    transition-all duration-300 relative border-2
+    bg-[#F9F9F9] border-[#CCCCCC]
+
+    flex flex-row md:flex-col
+    w-full md:w-75
+  "
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#235E3A")}
+      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#CCCCCC")}
       whileHover={{ scale: 1.05 }}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -136,69 +142,98 @@ const MealCard = ({ meal }) => {
       viewport={{ once: true }}
     >
       {/* ❤️ Like Button */}
-      <button onClick={toggleLike} className="absolute top-3 right-3 z-10">
+      <button className="absolute top-3 right-3 z-10" onClick={toggleLike}>
         <Heart
           size={24}
-          className={`transition-colors duration-300`}
-          style={isLiked ? { fill: '#F01D1D', color: '#F01D1D' } : { fill: 'none', color: '#CCCCCC' }}
+          className="transition-colors duration-300"
+          style={
+            isLiked
+              ? { fill: "#F01D1D", color: "#F01D1D" }
+              : { fill: "none", color: "#CCCCCC" }
+          }
         />
       </button>
 
+      {/* 🖼 Image */}
       <img
         src={meal.image}
         alt={meal.name}
-        className="h-48 w-full object-cover"
+        className="
+      object-cover
+      w-32 h-32
+      md:w-full md:h-48
+      shrink-0
+    "
       />
 
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-1">
-          <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>{meal.name}</h2>
-          <span className="font-bold" style={{ color: '#000000' }}>₹{meal.price}</span>
-        </div>
+      {/* 📦 Content */}
+      <div className="p-4 md:p-5 flex flex-col justify-between flex-1">
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <h2 className="text-lg font-semibold text-black">
+              {meal.name}
+            </h2>
+            <span className="font-bold text-black">
+              ₹{meal.price}
+            </span>
+          </div>
 
-        {/* ⭐ Rating */}
-        <div className="flex items-center justify-between mb-3">
-          <StarRating value={userRating} onRate={rateMeal} />
-          <span className="text-sm" style={{ color: '#666666' }}>
-            Avg ⭐ {meal.avgRating.toFixed(1)}
-          </span>
-        </div>
+          {/* ⭐ Rating */}
+          <div className="flex items-center justify-between mb-3">
+            <StarRating value={userRating} onRate={rateMeal} />
+            <span className="text-sm text-[#666666]">
+              Avg ⭐ {meal.avgRating.toFixed(1)}
+            </span>
+          </div>
 
-        {/* Macros */}
-        <div className="text-sm grid grid-cols-2 gap-y-1 mb-4" style={{ color: '#666666' }}>
-          <p>Protein: {meal.macros.protein}g</p>
-          <p>Carbs: {meal.macros.carbs}g</p>
-          <p>Fats: {meal.macros.fats}g</p>
-          <p>Calories: {meal.macros.calories}</p>
+          {/* Macros */}
+          <div className="text-sm grid grid-cols-2 gap-y-1 mb-4 text-[#666666]">
+            <p>Protein: {meal.macros.protein}g</p>
+            <p>Carbs: {meal.macros.carbs}g</p>
+            <p>Fats: {meal.macros.fats}g</p>
+            <p>Calories: {meal.macros.calories}</p>
+          </div>
         </div>
 
         {/* 🛒 Add to Cart */}
-        <button
-          onClick={addToCart}
-          disabled={inCart}
-          className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl transition-all duration-300 cursor-pointer text-white font-medium
-            ${inCart
-              ? "cursor-not-allowed opacity-60"
-              : "hover:opacity-90 hover:shadow-lg"
-            }`}
-          style={inCart ? { backgroundColor: '#CCCCCC', color: '#666666' } : { backgroundColor: '#000000', color: '#FFFFFF' }}
-        >
-          <ShoppingCart size={18} />
-          {inCart ? "Added to Cart" : "Add to Cart"}
-        </button>
+        <div>
+          <button
+            onClick={addToCart}
+            disabled={inCart}
+            className={`
+          w-full flex items-center justify-center gap-2 py-2 rounded-xl
+          transition-all duration-300 font-medium
+          ${inCart
+                ? "cursor-not-allowed opacity-60 bg-[#CCCCCC] text-[#666666]"
+                : "bg-black text-white hover:opacity-90 hover:shadow-lg"
+              }
+        `}
+          >
+            <ShoppingCart size={18} />
+            {inCart ? "Added to Cart" : "Add to Cart"}
+          </button>
 
-        {/* Veg / Non-Veg Tag */}
-        <span
-          className={`inline-block mt-3 px-3 py-1 text-xs rounded-full font-medium`}
-          style={meal.type === "veg"
-            ? { backgroundColor: 'rgba(46, 204, 113, 0.2)', color: '#2ECC71' }
-            : { backgroundColor: 'rgba(204, 204, 204, 0.2)', color: '#666666' }
-          }
-        >
-          {meal.type === "veg" ? "Veg" : "Non-Veg"}
-        </span>
+          {/* Veg / Non-Veg Tag */}
+          <span
+            className="inline-block mt-3 px-3 py-1 text-xs rounded-full font-medium"
+            style={
+              meal.type === "veg"
+                ? {
+                  backgroundColor: "rgba(46, 204, 113, 0.2)",
+                  color: "#2ECC71",
+                }
+                : {
+                  backgroundColor: "rgba(204, 204, 204, 0.2)",
+                  color: "#666666",
+                }
+            }
+          >
+            {meal.type === "veg" ? "Veg" : "Non-Veg"}
+          </span>
+        </div>
       </div>
     </motion.div>
+
   );
 };
 
@@ -249,10 +284,10 @@ const DiscoverMeals = () => {
 
   return (
     <motion.div
-      className="bg-green-800/80 py-10"
+      className="bg-linear-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] py-10"
     >
       <motion.div
-        className="max-w-7xl mx-auto px-5 my-14 py-10 shadow-2xl bg-green-100 rounded-3xl"
+        className="max-w-7xl mx-auto px-5 my-14 py-10 shadow-2xl bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 rounded-3xl"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -299,7 +334,7 @@ const DiscoverMeals = () => {
             <p className="text-lg" style={{ color: '#666666' }}>No meals available</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap gap-8 items-start justify-center">
             {filteredMeals.map((meal) => (
               <MealCard key={meal._id} meal={meal} />
             ))}

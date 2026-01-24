@@ -8,7 +8,7 @@ const EmptyState = ({
   icon,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 px-4">
+    <div className="flex flex-col items-center justify-center text-center py-20 px-4 min-h-screen">
       <div className="text-6xl mb-4">{icon}</div>
 
       <h2 className="text-2xl font-semibold mb-2">

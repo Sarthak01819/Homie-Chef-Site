@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import Loader from "../components/Loader";
 import toast from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Skeleton from "../components/Skeleton";
 import { apiFetch } from "../services/api";
+
+import MealDetailsModal from "../components/MealDetailsModal";
+import MealDetailsSheet from "../components/MealDetailSheet";
+import ErrorState from "../components/ErrorState";
 
 const Subscription = () => {
   const [plans, setPlans] = useState([]);
@@ -13,29 +16,17 @@ const Subscription = () => {
 
   const [duration, setDuration] = useState(7);
   const [expandedPlan, setExpandedPlan] = useState(null);
-  const [expandedMeal, setExpandedMeal] = useState(null);
 
   const [mySubscription, setMySubscription] = useState(null);
   const [error, setError] = useState(null);
+
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [mealType, setMealType] = useState(null);
 
   const customizations = {
     exclusions: [],
     spiceLevel: "medium",
     notes: "",
-  };
-
-  const fetchPlans = async () => {
-    try {
-      setError(null);
-      const data = await apiFetch(
-        `${import.meta.env.VITE_API_URL}/subscriptions`
-      );
-      setPlans(data);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   /* =========================
@@ -64,13 +55,13 @@ const Subscription = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await fetch(
+        setError(null);
+        const data = await apiFetch(
           `${import.meta.env.VITE_API_URL}/subscriptions`
         );
-        const data = await res.json();
         setPlans(Array.isArray(data) ? data : []);
-      } catch {
-        toast.error("Failed to load subscription plans");
+      } catch (err) {
+        setError(err);
       } finally {
         setLoading(false);
       }
@@ -107,17 +98,10 @@ const Subscription = () => {
      SUBSCRIBE + PAY
   ========================= */
   const handleSubscribe = async (plan) => {
-    if (paying) return;
+    if (paying || hasActiveSubscription) return;
 
     if (!razorpayReady) {
       toast.error("Payment gateway still loading. Please wait.");
-      return;
-    }
-
-    if (hasActiveSubscription) {
-      toast.error(
-        "You already have an active subscription. Cancel it to buy a new one."
-      );
       return;
     }
 
@@ -174,6 +158,7 @@ const Subscription = () => {
               toast.error(
                 verifyData.message || "Payment verification failed"
               );
+              setPaying(false);
               return;
             }
 
@@ -181,9 +166,14 @@ const Subscription = () => {
             setMySubscription(verifyData.subscription);
           } catch {
             toast.error("Verification failed");
-          } finally {
             setPaying(false);
           }
+        },
+
+        modal: {
+          ondismiss: () => {
+            setPaying(false); // payment cancelled
+          },
         },
 
         theme: { color: "#1F8A5B" },
@@ -203,23 +193,6 @@ const Subscription = () => {
         <div className="max-w-6xl mx-auto px-4 space-y-8">
           <Skeleton className="h-8 w-64 mx-auto" />
           <Skeleton className="h-5 w-48 mx-auto" />
-
-          <div className="flex justify-center gap-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-10 w-24 rounded-xl" />
-            ))}
-          </div>
-
-          {[1, 2].map((i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-6 shadow space-y-4"
-            >
-              <Skeleton className="h-5 w-1/3" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ))}
         </div>
       </div>
     );
@@ -228,12 +201,8 @@ const Subscription = () => {
   if (error) {
     return (
       <ErrorState
-        type={error.type}
-        message={error.message}
-        onRetry={() => {
-          setLoading(true);
-          fetchPlans();
-        }}
+        message="Failed to load subscription plans"
+        onRetry={() => window.location.reload()}
       />
     );
   }
@@ -243,173 +212,140 @@ const Subscription = () => {
   );
 
   return (
-    <motion.div className="min-h-screen bg-green-800/80 py-24">
-      <motion.div
-        className="max-w-6xl mx-auto px-4 py-8 bg-green-100/60 rounded-3xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h1 className="text-3xl font-bold text-center mb-2">
+    <motion.div className="min-h-screen bg-linear-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] py-24">
+      <motion.div className="max-w-6xl mx-auto px-4 py-8 bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 rounded-3xl">
+        <h1 className="text-3xl font-bold text-center mb-6">
           Subscription Plans
         </h1>
-
-        <p className="text-center font-medium mb-6">
-          🌱 100% Vegetarian Meals
-        </p>
 
         {/* Duration Selector */}
         <div className="flex justify-center gap-3 mb-8">
           {[7, 15, 30].map((d) => (
-            <motion.button
+            <button
               key={d}
               onClick={() => setDuration(d)}
-              className={`px-5 py-2 rounded-xl border font-medium transition ${duration === d
-                ? "bg-green-800/80 text-white"
-                : "bg-white hover:bg-green-100"
-                }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className={`px-5 py-2 rounded-xl border ${
+                duration === d
+                  ? "bg-green-800/80 text-white"
+                  : "bg-white"
+              }`}
             >
               {d} Days
-            </motion.button>
+            </button>
           ))}
         </div>
 
-        {/* Plans */}
-        <div>
-          {filteredPlans.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex flex-col items-center justify-center py-20 text-center"
-            >
-              <div className="text-6xl mb-4">🥗</div>
-              <h2 className="text-2xl font-semibold mb-2">
-                Plans coming soon
+        {filteredPlans.map((plan) => (
+          <div key={plan._id} className=" p-5 rounded-2xl mb-6 bg-white shadow-md">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold">
+                {plan.durationDays} Days Veg Plan
               </h2>
-              <p className="text-gray-600 max-w-md">
-                We’re preparing fresh vegetarian meal plans for this duration.
-                Please try another plan.
-              </p>
-            </motion.div>
-          ) : (
-            filteredPlans.map((plan) => (
-              <motion.div
-                key={plan._id}
-                layout
-                className="rounded-2xl shadow-md p-5 mb-6 border bg-white"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-xl font-semibold">
-                      {plan.durationDays} Days Veg Plan
-                    </h2>
-                    <p className="text-gray-600">
-                      ₹{plan.basePrice}
-                    </p>
-                  </div>
 
-                  <motion.button
-                    onClick={() =>
-                      setExpandedPlan(
-                        expandedPlan === plan._id ? null : plan._id
-                      )
-                    }
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 rounded-xl border hover:bg-green-800/80 hover:text-white transition"
+              <span className="text-lg font-bold text-green-700">
+                ₹{plan.basePrice}
+              </span>
+            </div>
+
+            <button
+              onClick={() =>
+                setExpandedPlan(
+                  expandedPlan === plan._id ? null : plan._id
+                )
+              }
+              className="text-green-700 font-medium mb-3 py-4 px-6 cursor-pointer shadow-md rounded-lg hover:bg-green-100 transition"
+            >
+              {expandedPlan === plan._id ? "Hide Meals" : "View Meals"}
+            </button>
+
+            {expandedPlan === plan._id &&
+              plan.mealsByDay?.map((dayObj) => {
+                const lunch = dayObj.lunch?.meal;
+                const dinner = dayObj.dinner?.meal;
+
+                return (
+                  <div
+                    key={dayObj.day}
+                    className="border rounded-xl p-4 mt-3 space-y-2"
                   >
-                    {expandedPlan === plan._id
-                      ? "Hide Meals"
-                      : "View Meals"}
-                  </motion.button>
-                </div>
+                    <p className="font-medium">Day {dayObj.day}</p>
 
-                <AnimatePresence>
-                  {expandedPlan === plan._id && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="mt-5 border-t pt-4 space-y-3"
-                    >
-                      {plan.mealsByDay?.map(({ meal }, idx) => {
-                        if (!meal) return null;
-                        const macros = meal.macros || {};
+                    {lunch && (
+                      <div className="flex justify-between items-center text-sm border-b pb-2 border-gray-200">
+                        <span>
+                          Lunch: <b>{lunch.name}</b>
+                        </span>
+                        <button
+                          onClick={() => {
+                            setSelectedMeal(lunch);
+                            setMealType("lunch");
+                          }}
+                          className="text-green-700 font-medium cursor-pointer px-4 py-2 shadow-md rounded-lg hover:bg-green-100 transition"
+                        >
+                          View More
+                        </button>
+                      </div>
+                    )}
 
-                        return (
-                          <motion.div
-                            key={idx}
-                            layout
-                            className="border rounded-xl p-3"
-                          >
-                            <div className="flex justify-between items-center">
-                              <p className="font-medium">
-                                Day {idx + 1} — {meal.name}
-                              </p>
+                    {dinner && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span>
+                          Dinner: <b>{dinner.name}</b>
+                        </span>
+                        <button
+                          onClick={() => {
+                            setSelectedMeal(dinner);
+                            setMealType("dinner");
+                          }}
+                          className="text-green-700 font-medium cursor-pointer px-4 py-2 shadow-md rounded-lg hover:bg-green-100 transition"
+                        >
+                          View More
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
-                              <motion.button
-                                onClick={() =>
-                                  setExpandedMeal(
-                                    expandedMeal === `${plan._id}-${idx}`
-                                      ? null
-                                      : `${plan._id}-${idx}`
-                                  )
-                                }
-                                whileHover={{ scale: 1.05 }}
-                                className="text-sm text-green-700"
-                              >
-                                {expandedMeal === `${plan._id}-${idx}`
-                                  ? "Hide Macros"
-                                  : "View Macros"}
-                              </motion.button>
-                            </div>
+            <button
+              onClick={() => handleSubscribe(plan)}
+              disabled={paying || hasActiveSubscription}
+              className={`w-full mt-4 py-3 rounded-xl font-medium transition cursor-pointer ${
+                hasActiveSubscription
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : paying
+                  ? "bg-green-700 text-white"
+                  : "bg-black text-white hover:bg-green-700"
+              }`}
+            >
+              {hasActiveSubscription
+                ? "Plan already activated"
+                : paying
+                ? "Processing..."
+                : "Pay to Subscribe"}
+            </button>
+          </div>
+        ))}
 
-                            <AnimatePresence>
-                              {expandedMeal === `${plan._id}-${idx}` && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: 6 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: 6 }}
-                                  className="text-sm mt-2 grid grid-cols-2 md:grid-cols-4 gap-4"
-                                >
-                                  <p><b>Calories:</b> {macros.calories ?? "N/A"}</p>
-                                  <p><b>Protein:</b> {macros.protein ?? "N/A"}g</p>
-                                  <p><b>Carbs:</b> {macros.carbs ?? "N/A"}g</p>
-                                  <p><b>Fats:</b> {macros.fats ?? "N/A"}g</p>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </motion.div>
-                        );
-                      })}
+        {selectedMeal && (
+          <>
+            <div className="hidden md:block">
+              <MealDetailsModal
+                meal={selectedMeal}
+                type={mealType}
+                onClose={() => setSelectedMeal(null)}
+              />
+            </div>
 
-                      <button
-                        disabled={paying || hasActiveSubscription || !razorpayReady}
-                        onClick={() => handleSubscribe(plan)}
-                        className={`w-full py-3 rounded-xl font-medium transition ${hasActiveSubscription || !razorpayReady
-                          ? "bg-gray-300 text-gray-600"
-                          : "bg-linear-to-r from-[#4B0C37] to-[#119DA4] text-white hover:from-[#119DA4] hover:to-[#4B0C37] transition-all duration-300"
-                          }`}
-                      >
-                        {!razorpayReady
-                          ? "Loading Payment Gateway..."
-                          : hasActiveSubscription
-                            ? "Active subscription exists"
-                            : paying
-                              ? "Processing..."
-                              : "Pay to Subscribe"}
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))
-          )}
-        </div>
-
+            <div className="md:hidden">
+              <MealDetailsSheet
+                meal={selectedMeal}
+                type={mealType}
+                onClose={() => setSelectedMeal(null)}
+              />
+            </div>
+          </>
+        )}
       </motion.div>
     </motion.div>
   );

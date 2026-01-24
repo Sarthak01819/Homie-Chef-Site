@@ -74,7 +74,10 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex gap-4 items-center font-medium">
-          <li className="flex gap-4 border-r pr-4" style={{ borderColor: "rgba(15,23,42,0.15)" }}>
+          <li
+            className="flex gap-4 border-r pr-4"
+            style={{ borderColor: "rgba(15,23,42,0.15)" }}
+          >
             <NavItem to="/" icon={<Home size={18} />} text="Home" />
             <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover Meals" />
             <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
@@ -97,20 +100,36 @@ const Navbar = () => {
             />
 
             {user && (
-              <NavItem
-                to="/favourites"
-                icon={
-                  <div className="relative">
-                    <Heart size={18} />
-                    {favouriteCount > 0 && (
-                      <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
-                        {favouriteCount}
-                      </span>
-                    )}
-                  </div>
-                }
-                text=""
-              />
+              <>
+                <NavItem
+                  to="/favourites"
+                  icon={
+                    <div className="relative">
+                      <Heart size={18} />
+                      {favouriteCount > 0 && (
+                        <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
+                          {favouriteCount}
+                        </span>
+                      )}
+                    </div>
+                  }
+                  text=""
+                />
+                <NavItem
+                  to="/tracker"
+                  icon={
+                    <div className="relative">
+                      <BadgeCheck size={18} />
+                      {favouriteCount > 0 && (
+                        <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
+                          {favouriteCount}
+                        </span>
+                      )}
+                    </div>
+                  }
+                  text="Track"
+                />
+              </>
             )}
 
             {!user ? (
@@ -121,7 +140,7 @@ const Navbar = () => {
                 highlight
               />
             ) : (
-              <li className="relative">
+              <div className="relative">
                 {/* Avatar */}
                 <motion.button
                   onClick={() => setDropdown((p) => !p)}
@@ -151,7 +170,7 @@ const Navbar = () => {
                     </motion.button>
                   </div>
                 )}
-              </li>
+              </div>
             )}
           </li>
         </ul>
@@ -187,8 +206,7 @@ const Navbar = () => {
                   onClick={handleLogout}
                   disabled={loggingOut}
                   whileHover={{ scale: 1.04 }}
-                  className="px-4 py-3 rounded-xl text-white font-medium disabled:opacity-60"
-                  style={{ backgroundColor: "#1F8A5B" }}
+                  className="px-4 py-3 rounded-xl text-black font-medium disabled:opacity-60 border border-red-600/80 bg-red-600 w-full mt-8 active:scale-95"
                 >
                   {loggingOut ? "Logging out..." : "Logout"}
                 </motion.button>
@@ -206,8 +224,7 @@ const NavItem = ({ to, icon, text, highlight }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `px-4 py-2 rounded-xl flex items-center gap-2 transition-all ${
-        isActive || highlight ? "text-white" : "text-slate-900"
+      `px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 transition-all ${isActive || highlight ? "text-white" : "text-slate-900"
       }`
     }
     style={({ isActive }) =>
@@ -239,8 +256,7 @@ const MobileItem = ({ to, text, highlight, onClick }) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `px-4 py-3 rounded-xl transition ${
-        isActive || highlight ? "text-white" : "text-slate-900"
+      `px-4 py-3 rounded-xl transition shadow-lg ${isActive || highlight ? "text-white" : "text-slate-900"
       }`
     }
     style={({ isActive }) =>
