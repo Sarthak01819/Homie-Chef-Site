@@ -1,54 +1,51 @@
 import mongoose from "mongoose";
 
+const macroSchema = new mongoose.Schema(
+  {
+    calories: Number,
+    protein: Number,
+    carbs: Number,
+    fats: Number,
+  },
+  { _id: false }
+);
+
+const mealItemSchema = new mongoose.Schema(
+  {
+    name: String,          // roti, rice, salad
+    quantity: String,      // 2 pcs, 1 bowl
+  },
+  { _id: false }
+);
+
 const mealSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-
-        type: {
-            type: String,
-            enum: ["veg", "non-veg"],
-            required: true,
-        },
-
-        price: {
-            type: Number,
-            required: true,
-        },
-
-        image: {
-            type: String, // Cloudinary image URL
-            required: true,
-        },
-
-        macros: {
-            protein: {
-                type: Number,
-                required: true,
-            },
-            carbs: {
-                type: Number,
-                required: true,
-            },
-            fats: {
-                type: Number,
-                required: true,
-            },
-            calories: {
-                type: Number,
-                required: true,
-            },
-        },
-
-        avgRating: {
-            type: Number,
-            default: 0,
-        },
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    { timestamps: true }
+
+    image: String,
+
+    price: Number,
+
+    items: {
+      type: [mealItemSchema],
+      default: [],
+    },
+
+    macros: {
+      type: macroSchema,
+      required: true,
+    },
+
+    category: {
+      type: String,
+      enum: ["veg", "non-veg"],
+      default: "veg",
+    },
+  },
+  { timestamps: true }
 );
 
 export default mongoose.model("Meal", mealSchema);

@@ -109,7 +109,12 @@ app.use(cookieParser());
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_FRONTEND_URL,
+
+  // Always allow local dev frontends
+  "http://localhost:5173",
+  "http://localhost:5174",
 ];
+
 
 app.use(
   cors({

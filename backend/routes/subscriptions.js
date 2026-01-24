@@ -13,14 +13,16 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     try {
         const plans = await SubscriptionPlan.find()
-            .populate("mealsByDay.meal")
-            .sort({ durationDays: 1 });
+            .populate("mealsByDay.lunch.meal")
+            .populate("mealsByDay.dinner.meal");
 
         res.json(plans);
-    } catch {
-        res.status(500).json({ message: "Failed to fetch subscriptions" });
+    } catch (err) {
+        console.error("SUBSCRIPTIONS ERROR:", err);
+        res.status(500).json({ message: "Failed to load subscriptions" });
     }
 });
+
 
 /* =========================
    GET MY ACTIVE SUBSCRIPTION
@@ -33,11 +35,12 @@ router.get("/my", protect, async (req, res) => {
             status: "active",
         }).populate({
             path: "plan",
-            populate: {
-                path: "mealsByDay.meal",
-                model: "Meal",
-            },
+            populate: [
+                { path: "mealsByDay.lunch.meal", model: "Meal" },
+                { path: "mealsByDay.dinner.meal", model: "Meal" },
+            ],
         });
+
 
         res.json(subscription || null);
     } catch (err) {

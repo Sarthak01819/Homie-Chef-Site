@@ -61,6 +61,19 @@ const Navbar = () => {
                         </NavLink>
 
                         <NavLink
+                            to="/admin/deliveries"
+                            className={({ isActive }) =>
+                                `flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
+                                    ? "bg-white/25 text-white shadow-lg backdrop-blur-sm"
+                                    : "text-white/90 hover:bg-white/15 hover:text-white hover:shadow-md"
+                                }`
+                            }
+                        >
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            Deliveries
+                        </NavLink>
+
+                        <NavLink
                             to="/orders"
                             className={({ isActive }) =>
                                 `flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
@@ -139,6 +152,19 @@ const Navbar = () => {
                         >
                             <ShoppingBag className="h-5 w-5 mr-3" />
                             Orders
+                        </NavLink>
+                        <NavLink
+                            to="/admin/deliveries"
+                            onClick={closeMenu}
+                            className={({ isActive }) =>
+                                `flex items-center px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 ${isActive
+                                    ? "bg-white/25 text-white shadow-lg"
+                                    : "text-white/90 hover:bg-white/15 hover:text-white"
+                                }`
+                            }
+                        >
+                            <Truck className="h-5 w-5 mr-3" />
+                            Deliveries
                         </NavLink>
 
                         <NavLink

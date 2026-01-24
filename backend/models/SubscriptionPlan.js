@@ -3,13 +3,24 @@ import mongoose from "mongoose";
 const dailyMealSchema = new mongoose.Schema(
     {
         day: {
-            type: String,
-            required: true, // Monday, Tuesday, etc.
-        },
-        meal: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Meal",
+            type: Number, // 1 → 30
             required: true,
+        },
+
+        lunch: {
+            meal: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Meal",
+                required: true,
+            },
+        },
+
+        dinner: {
+            meal: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Meal",
+                required: true,
+            },
         },
     },
     { _id: false }
@@ -19,7 +30,7 @@ const subscriptionPlanSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true, // Weekly / Monthly
+            required: true,
         },
 
         category: {
@@ -30,7 +41,8 @@ const subscriptionPlanSchema = new mongoose.Schema(
 
         durationDays: {
             type: Number,
-            required: true, // 7 or 30
+            enum: [7, 15, 30],
+            required: true,
         },
 
         basePrice: {

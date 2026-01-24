@@ -6,6 +6,7 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import Layout from "./components/Layout";
+import DeliveryLogs from "./pages/DeliveryLogs";
 
 const App = () => {
   return (
@@ -18,6 +19,17 @@ const App = () => {
           <AdminProtectedRoute>
             <Layout>
               <AdminUsers />
+            </Layout>
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/deliveries"
+        element={
+          <AdminProtectedRoute>
+            <Layout>
+              <DeliveryLogs />
             </Layout>
           </AdminProtectedRoute>
         }

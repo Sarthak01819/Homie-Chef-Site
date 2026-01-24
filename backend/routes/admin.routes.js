@@ -7,6 +7,15 @@ import AuditLog from "../models/AuditLog.js";
 
 const router = express.Router();
 
+router.get("/me", protect, adminProtect, (req, res) => {
+    res.json({
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+    });
+});
+
 /* =========================
    ADMIN HEALTH CHECK
 ========================= */
@@ -116,5 +125,53 @@ router.get("/audit-logs", protect, adminProtect, async (req, res) => {
         res.status(500).json({ message: "Failed to fetch audit logs" });
     }
 });
+
+/* =========================
+   DELIVERY CONFIRMATION
+========================= */
+router.get(
+    "/deliveries",
+    protect,
+    adminProtect,
+    async (req, res) => {
+        try {
+            const deliveries = await AuditLog.find({
+                action: "MEAL_DELIVERED",
+            })
+                .sort({ createdAt: -1 })
+                .populate("performedBy", "name email");
+
+            res.json(deliveries);
+        } catch (err) {
+            res.status(500).json({
+                message: "Failed to fetch delivery logs",
+            });
+        }
+    }
+);
+
+/* =========================
+   CUSTOMIZATION REQUEST
+========================= */
+router.get(
+    "/customization-requests",
+    protect,
+    adminProtect,
+    async (req, res) => {
+        try {
+            const requests = await AuditLog.find({
+                action: "CUSTOMIZATION_REQUEST",
+            })
+                .sort({ createdAt: -1 })
+                .populate("performedBy", "name email");
+
+            res.json(requests);
+        } catch (err) {
+            res.status(500).json({
+                message: "Failed to fetch customization requests",
+            });
+        }
+    }
+);
 
 export default router;
