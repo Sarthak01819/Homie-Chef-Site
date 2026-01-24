@@ -30,6 +30,7 @@ const requiredEnv = [
   "JWT_REFRESH_SECRET",
   "MONGO_URI",
   "FRONTEND_URL",
+  "ADMIN_FRONTEND_URL",
 ];
 
 requiredEnv.forEach((key) => {
@@ -115,7 +116,6 @@ const allowedOrigins = [
   "http://localhost:5174",
 ];
 
-
 app.use(
   cors({
     origin(origin, callback) {
@@ -128,6 +128,9 @@ app.use(
     credentials: true,
   })
 );
+
+// ✅ MUST be before routes
+app.options("*", cors());
 
 /* =========================
    🧾 REQUEST LOGGING
