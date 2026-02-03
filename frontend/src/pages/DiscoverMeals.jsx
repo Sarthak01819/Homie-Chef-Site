@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ErrorState from "../components/ErrorState";
+import SubscriptionPromo from "../components/SubscriptionPromo";
 
 
 /* =========================
@@ -131,7 +132,7 @@ const MealCard = ({ meal }) => {
     bg-[#F9F9F9] border-[#CCCCCC]
 
     flex flex-row md:flex-col
-    w-full md:w-75
+    w-full md:w-98
   "
       onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#235E3A")}
       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#CCCCCC")}
@@ -217,7 +218,7 @@ const MealCard = ({ meal }) => {
           <span
             className="inline-block mt-3 px-3 py-1 text-xs rounded-full font-medium"
             style={
-              meal.type === "veg"
+              (meal.category || meal.type) === "veg"
                 ? {
                   backgroundColor: "rgba(46, 204, 113, 0.2)",
                   color: "#2ECC71",
@@ -228,7 +229,7 @@ const MealCard = ({ meal }) => {
                 }
             }
           >
-            {meal.type === "veg" ? "Veg" : "Non-Veg"}
+            {(meal.category || meal.type) === "veg" ? "Veg" : "Non-Veg"}
           </span>
         </div>
       </div>
@@ -278,7 +279,7 @@ const DiscoverMeals = () => {
   const filteredMeals =
     filter === "breakfast"
       ? [] // Breakfast shows "Coming Soon!"
-      : meals.filter((meal) => meal.type === "veg"); // Lunch and Dinner show only veg
+      : meals.filter((meal) => (meal.category || meal.type) === "veg"); // Lunch and Dinner show only veg
 
   if (loading) return <Loader text="Loading meals..." />;
 
@@ -334,12 +335,15 @@ const DiscoverMeals = () => {
             <p className="text-lg" style={{ color: '#666666' }}>No meals available</p>
           </div>
         ) : (
-          <div className="flex flex-wrap gap-8 items-start justify-center">
+          <div className="flex flex-wrap gap-8 items-start justify-start">
             {filteredMeals.map((meal) => (
               <MealCard key={meal._id} meal={meal} />
             ))}
           </div>
         )}
+        <div className="mt-20">
+          <SubscriptionPromo />
+        </div>
       </motion.div>
     </motion.div>
   );

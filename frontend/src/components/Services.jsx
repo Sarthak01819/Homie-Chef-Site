@@ -1,83 +1,127 @@
-import React, { memo } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import {
-    ClockFading,
-    Library,
-    Salad,
-    Sprout,
+    Utensils,
+    Truck,
+    CalendarCheck,
+    Leaf
 } from "lucide-react";
-import { motion } from "framer-motion";
 
-/* -------------------- DATA -------------------- */
-
-const SERVICES = [
-
+const services = [
     {
         id: 1,
-        Icon: Salad,
-        title: "Fresh Ingredients",
-        desc: "Sourced from local farms and delivered to your doorstep.",
+        Icon: Utensils,
+        title: "Freshly Cooked Meals",
+        desc: "Meals are prepared fresh every day with quality ingredients.",
+        delay: 0
     },
     {
         id: 2,
-        Icon: Library,
-        title: "Recipe Ideas",
-        desc: "Access to a library of delicious and healthy recipes.",
+        Icon: Truck,
+        title: "Daily Doorstep Delivery",
+        desc: "Hot meals delivered to your doorstep, right on time.",
+        delay: 0.1
     },
     {
         id: 3,
-        Icon: ClockFading,
-        title: "24/7 Customer Support",
-        desc: "We're here to help you anytime you need assistance.",
+        Icon: CalendarCheck,
+        title: "Flexible Subscription",
+        desc: "Choose 7, 15 or 30 day plans as per your lifestyle.",
+        delay: 0.2
     },
     {
         id: 4,
-        Icon: Sprout,
-        title: "Eco-Friendly Packaging",
-        desc: "Committed to sustainability and reducing waste.",
-    },
+        Icon: Leaf,
+        title: "100% Pure Veg",
+        desc: "Healthy vegetarian meals designed for daily nutrition.",
+        delay: 0.3
+    }
 ];
 
-/* -------------------- MAIN COMPONENT -------------------- */
+const ServiceCard = ({ Icon, title, desc, delay, index }) => {
+    const ref = useRef(null);
+    const { scrollY } = useScroll();
+    const y = useTransform(scrollY, [0, 1000], [0, index % 2 === 0 ? 50 : -50]);
 
-const Services = () => {
     return (
-        <motion.section 
-            className="w-full py-16 flex flex-col items-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay }}
+            style={{ y }}
+            className="relative group"
         >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold uppercase mb-12 text-center">
-                Our Awesome Services
-            </h2>
+            <motion.div
+                whileHover={{ scale: 1.08, rotateZ: 2 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="h-full p-6 rounded-2xl border border-gray-200 bg-gray-50 cursor-pointer overflow-hidden"
+            >
+                {/* Background glow effect */}
+                <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-[#119DA4]/0 to-[#119DA4]/0 group-hover:from-[#119DA4]/5 group-hover:to-[#119DA4]/10 rounded-2xl"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                />
 
-            <div className="max-w-7xl w-full px-6">
-                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 bg-linear-to-r from-[#119DA4]/10 to-[#FDE789]/10 py-10 px-6 rounded-3xl border border-white/20 shadow-lg">
-                    {SERVICES.map((service) => (
-                        <ServiceCard key={service.id} {...service} />
-                    ))}
-                </ul>
-            </div>
-        </motion.section>
+                <div className="relative z-10">
+                    {/* Animated Icon */}
+                    <motion.div
+                        whileHover={{ rotate: 360, scale: 1.2 }}
+                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                        className="mb-4 inline-block"
+                    >
+                        <Icon size={32} className="text-[#119DA4]" />
+                    </motion.div>
+
+                    <h3 className="text-lg font-semibold mb-2">
+                        {title}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                        {desc}
+                    </p>
+                </div>
+
+                {/* Animated border on hover */}
+                <motion.div
+                    className="absolute inset-0 rounded-2xl border-2 border-[#119DA4]"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                />
+            </motion.div>
+        </motion.div>
     );
 };
 
-/* -------------------- SERVICE CARD -------------------- */
+const Services = () => {
+    return (
+        <section className="pt-20 pb-12 bg-white">
+            <div className="max-w-6xl mx-auto px-6">
+                <motion.h2
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="text-3xl md:text-4xl font-bold text-center mb-12"
+                >
+                    Our Services
+                </motion.h2>
 
-const ServiceCard = memo(({ Icon, title, desc }) => (
-    <motion.li 
-        className="flex items-start gap-4 p-6 rounded-2xl bg-white/80 backdrop-blur-md shadow-md hover:shadow-xl transition-all "
-        whileHover={{ scale: 1.05 }}
-    >
-        <div className="shrink-0">
-            <Icon className="w-10 h-10 bg-linear-to-r from-[#119DA4] to-[#FDE789] bg-clip-text text-transparent" />
-        </div>
-
-        <div>
-            <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
-            <p className="text-sm text-gray-600 mt-1">{desc}</p>
-        </div>
-    </motion.li>
-));
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {services.map((service, index) => (
+                        <ServiceCard
+                            key={service.id}
+                            {...service}
+                            index={index}
+                        />
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
 
 export default Services;

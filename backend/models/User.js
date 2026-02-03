@@ -98,6 +98,14 @@ const userSchema = new mongoose.Schema(
     },
 
     /* =========================
+       ADMIN SESSIONS (ISOLATED)
+    ========================= */
+    adminRefreshTokens: {
+      type: [refreshTokenSchema],
+      default: [],
+    },
+
+    /* =========================
        LOGIN SECURITY (FUTURE)
     ========================= */
     lastLoginAt: {

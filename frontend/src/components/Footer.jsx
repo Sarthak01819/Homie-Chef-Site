@@ -10,6 +10,7 @@ const Footer = () => {
       backdrop-blur-lg
       border-t border-black/30
       shadow-[0_-4px_20px_rgba(0,0,0,0.03)] 
+      bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 
     "
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -18,7 +19,7 @@ const Footer = () => {
       <div className=" max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <img
-            src={"/images/removed-bg-logo.png"}
+            src={"/images/logo3.png"}
             alt="Homie Chef Logo"
             className="h-12 w-auto"
           />

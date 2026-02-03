@@ -1,5 +1,16 @@
+
 @import "tailwindcss";
 
 /* =========================
-   BLACK AND WHITE THEME DESIGN SYSTEM CSS VARIABLES
+	BLACK AND WHITE THEME DESIGN SYSTEM CSS VARIABLES
 ========================= */
+
+:root {
+  /* Brand wood gradient used across the site */
+  --brand-wood-gradient: linear-gradient(90deg,#5A3A1E,#7A4A28,#8B5A2B);
+}
+
+/* Example usage:
+	background: var(--brand-wood-gradient);
+*/
+

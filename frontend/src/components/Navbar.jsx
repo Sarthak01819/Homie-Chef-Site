@@ -53,37 +53,53 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 w-full z-50 bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 backdrop-blur-2xl border-b shadow-xl"
+      className="fixed top-0 left-0 w-full z-50 bg-linear-to-r backdrop-blur-2xl border-b shadow-xl"
       style={{
-        backgroundColor: "rgba(240,253,244,0.75)",
+        background: "var(--brand-wood-gradient)",
         borderColor: "rgba(15,23,42,0.08)",
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="max-w-7xl mx-auto px-5 py-3 flex justify-between items-center">
+      <div className="w-full px-5 py-3 flex items-center">
         {/* Logo */}
-        <NavLink to="/" onClick={closeAll}>
-          <img
-            className="h-10 sm:h-12 w-auto"
-            src="/images/removed-bg-logo.png"
-            alt="Homie Chef Logo"
-          />
-        </NavLink>
+        <div className="w-1/3">
+          <NavLink to="/" onClick={closeAll}>
+            <img
+              className="h-10 sm:h-12 leading-1 w-auto"
+              src="/images/logo3.png"
+              alt="Homie Chef Logo"
+            />
+          </NavLink>
+        </div>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex gap-4 items-center font-medium">
-          <li
-            className="flex gap-4 border-r pr-4"
-            style={{ borderColor: "rgba(15,23,42,0.15)" }}
-          >
-            <NavItem to="/" icon={<Home size={18} />} text="Home" />
-            <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover Meals" />
-            <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
-          </li>
+        <div className="hidden md:flex font-medium gap-4 justify-between w-1/3"
+          style={{ borderColor: "rgba(15,23,42,0.15)" }}
+        >
+          <NavItem to="/" icon={<Home size={18} />} text="Home" />
+          <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
+          <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
+          {user && (<NavItem
+            to="/tracker"
+            icon={
+              <div className="relative">
+                <BadgeCheck size={18} />
+                {favouriteCount > 0 && (
+                  <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
+                    {favouriteCount}
+                  </span>
+                )}
+              </div>
+            }
+            text="Track"
+          />
+          )}
+        </div>
 
-          <li className="flex gap-4 items-center">
+        <div className="hidden md:flex font-medium gap-4 items-center justify-end w-1/3">
+          <motion.div className="flex gap-4 items-center ">
             <NavItem
               to="/cart"
               icon={
@@ -115,65 +131,49 @@ const Navbar = () => {
                   }
                   text=""
                 />
-                <NavItem
-                  to="/tracker"
-                  icon={
-                    <div className="relative">
-                      <BadgeCheck size={18} />
-                      {favouriteCount > 0 && (
-                        <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
-                          {favouriteCount}
-                        </span>
-                      )}
-                    </div>
-                  }
-                  text="Track"
-                />
               </>
             )}
+          </motion.div>
 
-            {!user ? (
-              <NavItem
-                to="/login"
-                icon={<ArrowRight size={18} />}
-                text="Get Started"
-                highlight
-              />
-            ) : (
-              <div className="relative">
-                {/* Avatar */}
-                <motion.button
-                  onClick={() => setDropdown((p) => !p)}
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-white transition"
-                  style={{ backgroundColor: "#1F8A5B" }}
-                >
-                  <User size={18} />
-                  <span className="text-sm">{user.name || "User"}</span>
-                </motion.button>
+          {!user ? (
+            <NavItem
+              to="/login"
+              icon={<ArrowRight size={18} />}
+              text="Get Started"
+              highlight
+            />
+          ) : (
+            <div className="relative">
+              {/* Avatar */}
+              <motion.button
+                onClick={() => setDropdown((p) => !p)}
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 px-4 py-4 justify-center rounded-full text-white transition bg-white/20 hover:bg-white/30 cursor-pointer"
+              >
+                <User size={22} />
+              </motion.button>
 
-                {/* Dropdown */}
-                {dropdown && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-xl border bg-white overflow-hidden">
-                    <DropdownItem to="/profile" icon={<User size={16} />} text="Profile" onClick={closeAll} />
-                    <DropdownItem to="/active-subscription" icon={<BadgeCheck size={16} />} text="My Subscription" onClick={closeAll} />
-                    <DropdownItem to="/orders" icon={<History size={16} />} text="Order History" onClick={closeAll} />
+              {/* Dropdown */}
+              {dropdown && (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-xl border bg-white overflow-hidden">
+                  <DropdownItem to="/profile" icon={<User size={16} />} text="Profile" onClick={closeAll} />
+                  <DropdownItem to="/active-subscription" icon={<BadgeCheck size={16} />} text="My Subscription" onClick={closeAll} />
+                  <DropdownItem to="/orders" icon={<History size={16} />} text="Order History" onClick={closeAll} />
 
-                    <motion.button
-                      onClick={handleLogout}
-                      disabled={loggingOut}
-                      whileHover={{ scale: 1.04 }}
-                      className="w-full flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 disabled:opacity-60"
-                    >
-                      <LogOut size={16} />
-                      {loggingOut ? "Logging out..." : "Logout"}
-                    </motion.button>
-                  </div>
-                )}
-              </div>
-            )}
-          </li>
-        </ul>
+                  <motion.button
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    whileHover={{ scale: 1.04 }}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 disabled:opacity-60"
+                  >
+                    <LogOut size={16} />
+                    {loggingOut ? "Logging out..." : "Logout"}
+                  </motion.button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Mobile Toggle */}
         <motion.button
@@ -224,12 +224,12 @@ const NavItem = ({ to, icon, text, highlight }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `px-4 py-2 rounded-xl shadow-xl flex items-center gap-2 transition-all ${isActive || highlight ? "text-white" : "text-slate-900"
+      `px-4 py-2 rounded-xl shadow-xl bg-[#916743] flex items-center gap-2 transition-all ${isActive || highlight ? "text-white" : "text-white/90"
       }`
     }
     style={({ isActive }) =>
       isActive || highlight
-        ? { backgroundColor: "#146B45" }
+        ? { backgroundColor: "#000000" }
         : {}
     }
   >
@@ -256,12 +256,12 @@ const MobileItem = ({ to, text, highlight, onClick }) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `px-4 py-3 rounded-xl transition shadow-lg ${isActive || highlight ? "text-white" : "text-slate-900"
+      `px-4 py-3 rounded-xl transition shadow-xl ${isActive || highlight ? "text-white" : "text-white/90"
       }`
     }
     style={({ isActive }) =>
       isActive || highlight
-        ? { backgroundColor: "#1F8A5B" }
+        ? { backgroundColor: "#000000" }
         : {}
     }
   >

@@ -12,6 +12,7 @@ export const logAudit = async ({
     await AuditLog.create({
       event,
       userId,
+      performedBy: userId,
       role,
       severity,
       ip: req?.ip,

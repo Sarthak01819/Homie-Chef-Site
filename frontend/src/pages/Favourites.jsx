@@ -133,7 +133,7 @@ const Favourites = () => {
 
                             <h2 className="font-semibold">{meal.name}</h2>
                             <p className="text-sm text-gray-500">
-                                {meal.type === "veg" ? "Veg" : "Non-Veg"} · ₹{meal.price}
+                                {(meal.category || meal.type) === "veg" ? "Veg" : "Non-Veg"} · ₹{meal.price}
                             </p>
                         </motion.div>
                     ))}

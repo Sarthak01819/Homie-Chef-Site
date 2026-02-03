@@ -3,6 +3,10 @@ import Services from './Services'
 import Whyus from './Whyus'
 import Food from './Food'
 import { motion } from "framer-motion";
+import SubscriptionPromo from './SubscriptionPromo';
+import ValueStrip from './ValueStrip';
+import HeroVeg from './HeroVeg';
+import UserGreeting from './UserGreeting';
 
 const Home = () => {
   return (
@@ -11,9 +15,13 @@ const Home = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-        <Hero />
+        {/* <Hero /> */}
+        <HeroVeg />
+        {/* <ValueStrip /> */}
+        <UserGreeting />
         <Services />
-        <Food />
+        <SubscriptionPromo />
+        {/* <Food /> */}
         <Whyus />
     </motion.div>
   )

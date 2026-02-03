@@ -11,6 +11,12 @@ const auditLogSchema = new mongoose.Schema(
             default: null, // null for unauthenticated events
         },
 
+        performedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
+
         role: {
             type: String,
             enum: ["user", "admin", "system"],
@@ -24,6 +30,12 @@ const auditLogSchema = new mongoose.Schema(
             type: String,
             required: true,
             index: true,
+        },
+
+        severity: {
+            type: String,
+            enum: ["info", "warning", "critical"],
+            default: "info",
         },
 
         /* =========================

@@ -7,6 +7,7 @@ import {
     LogOut,
     Menu,
     X,
+    Truck,
 } from "lucide-react";
 import { useAdminAuth } from "../context/AdminAuthContext";
 
@@ -17,7 +18,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/auth/admin/logout`, {
                 method: "POST",
                 credentials: "include",
             });
@@ -85,7 +86,10 @@ const Navbar = () => {
                             <ShoppingBag className="h-4 w-4 mr-2" />
                             Orders
                         </NavLink>
-
+                        <NavLink to="/admin/analytics">Analytics</NavLink>
+                        <NavLink to="/admin/customizations">
+                            Customizations
+                        </NavLink>
                         <NavLink
                             to="/users"
                             className={({ isActive }) =>
@@ -139,6 +143,7 @@ const Navbar = () => {
                             <BarChart3 className="h-5 w-5 mr-3" />
                             Dashboard
                         </NavLink>
+                        <NavLink to="/admin/analytics">Analytics</NavLink>
 
                         <NavLink
                             to="/orders"
@@ -153,6 +158,10 @@ const Navbar = () => {
                             <ShoppingBag className="h-5 w-5 mr-3" />
                             Orders
                         </NavLink>
+                        <NavLink to="/admin/customizations">
+                            Customizations
+                        </NavLink>
+
                         <NavLink
                             to="/admin/deliveries"
                             onClick={closeMenu}

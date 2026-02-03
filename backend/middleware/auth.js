@@ -2,7 +2,9 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 export const protect = async (req, res, next) => {
-  const token = req.cookies.token;
+  const token =
+    req.cookies.admin_token || req.cookies.token;
+
 
   /* =========================
      NO TOKEN
@@ -72,3 +74,9 @@ export const protect = async (req, res, next) => {
     });
   }
 };
+export const adminProtect = (req, res, next) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  next();
+}

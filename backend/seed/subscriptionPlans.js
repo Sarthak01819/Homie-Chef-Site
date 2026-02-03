@@ -14,7 +14,7 @@ const seedSubscriptions = async () => {
         /* =========================
            ENRICH VEG MEALS WITH ITEMS
         ========================= */
-        const vegMeals = await Meal.find({ type: "veg" });
+        const vegMeals = await Meal.find({ category: "veg" });
 
         if (vegMeals.length === 0) {
             throw new Error("No veg meals found. Seed meals first.");

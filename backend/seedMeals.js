@@ -8,7 +8,7 @@ const meals = [
     // 🟢 VEG MEALS
     {
         name: "Paneer Protein Bowl",
-        type: "veg",
+        category: "veg",
         price: 249,
         image:
             "https://res.cloudinary.com/demo/image/upload/paneer-bowl.jpg",
@@ -21,7 +21,7 @@ const meals = [
     },
     {
         name: "Veggie Salad Supreme",
-        type: "veg",
+        category: "veg",
         price: 199,
         image:
             "https://res.cloudinary.com/demo/image/upload/veggie-salad.jpg",
@@ -36,7 +36,7 @@ const meals = [
     // 🔴 NON-VEG MEALS
     {
         name: "Grilled Chicken Meal",
-        type: "non-veg",
+        category: "non-veg",
         price: 299,
         image:
             "https://res.cloudinary.com/demo/image/upload/grilled-chicken.jpg",
@@ -49,7 +49,7 @@ const meals = [
     },
     {
         name: "Chicken Rice Bowl",
-        type: "non-veg",
+        category: "non-veg",
         price: 279,
         image:
             "https://res.cloudinary.com/demo/image/upload/chicken-rice.jpg",

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Skeleton from "../components/Skeleton";
 import EmptyState from "../components/EmptyState";
-import { apiFetch } from "../services/api";
+import SubscriptionPromo from "../components/SubscriptionPromo";
 
 const DELIVERY_CHARGE = 49;
 const GST_RATE = 0.18;
@@ -20,7 +20,6 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [razorpayReady, setRazorpayReady] = useState(false);
   const [paying, setPaying] = useState(false);
-  const [error, setError] = useState(null);
 
   /* =========================
      LOAD RAZORPAY SCRIPT
@@ -255,42 +254,20 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <EmptyState
-        icon="🛒"
-        title="Your cart is empty"
-        description="Looks like you haven’t added any meals yet. Explore our fresh vegetarian dishes."
-        actionLabel="Discover Meals"
-        actionTo="/discover-meals"
-      />
+      <>
+        <EmptyState
+          icon="Cart"
+          title="Your cart is empty"
+          description="Add some meals to get started."
+          actionLabel="Browse Meals"
+          actionTo="/discover-meals"
+        />
+        <SubscriptionPromo />
+      </>
     );
   }
 
-  const fetchPlans = async () => {
-    try {
-      setError(null);
-      const data = await apiFetch(
-        `${import.meta.env.VITE_API_URL}/meals/cart`,
-      );
-      setPlans(data);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  if (error) {
-    return (
-      <ErrorState
-        type={error.type}
-        message={error.message}
-        onRetry={() => {
-          setLoading(true);
-          fetchPlans();
-        }}
-      />
-    );
-  }
 
   return (
     <motion.div

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import ConfirmActionModal from "../components/ConfirmActionModal";
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -7,6 +8,21 @@ const AdminOrders = () => {
     const [filter, setFilter] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [confirm, setConfirm] = useState(null);
+    const [processingId, setProcessingId] = useState(null);
+    const [highlightedRows, setHighlightedRows] = useState({});
+    const [selectedSubs, setSelectedSubs] = useState([]);
+    const [bulkConfirm, setBulkConfirm] = useState(null);
+
+    const toggleSelectSub = (subId) => {
+        setSelectedSubs((prev) =>
+            prev.includes(subId)
+                ? prev.filter((id) => id !== subId)
+                : [...prev, subId]
+        );
+    };
+
+
     const ordersPerPage = 10;
 
     /* =========================
@@ -55,6 +71,60 @@ const AdminOrders = () => {
         return matchesFilter && matchesSearch;
     });
 
+    const runSubscriptionAction = async (subscriptionId, action, successMsg) => {
+        try {
+            setProcessingId(subscriptionId);
+
+            const res = await fetch(
+                `${import.meta.env.VITE_API_URL}/admin/controls/subscriptions/${subscriptionId}/${action}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Action failed");
+            }
+
+            toast.success(successMsg);
+            setConfirm(null);
+            fetchOrders(); // refresh table
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const bulkAction = async (action) => {
+        let failed = 0;
+
+        try {
+            for (const subId of selectedSubs) {
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/admin/controls/subscriptions/${subId}/${action}`,
+                    { method: "POST", credentials: "include" }
+                );
+                if (!res.ok) failed++;
+            }
+
+            if (failed > 0) {
+                toast.error(`${failed} subscription(s) failed`);
+            } else {
+                toast.success(`Bulk ${action} completed`);
+            }
+
+            setSelectedSubs([]);
+            setBulkConfirm(null);
+            fetchOrders();
+        } catch {
+            toast.error("Bulk action failed");
+        }
+    };
+
     // Pagination
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
     const startIndex = (currentPage - 1) * ordersPerPage;
@@ -96,6 +166,34 @@ const AdminOrders = () => {
             toast.error("Cancellation failed");
         }
     };
+
+    useEffect(() => {
+        const handler = (e) => {
+            const { type, payload } = e.detail;
+
+            if (type.startsWith("SUB_")) {
+                setHighlightedRows((prev) => ({
+                    ...prev,
+                    [payload.subscriptionId]: type,
+                }));
+
+                // auto-clear after 4s
+                setTimeout(() => {
+                    setHighlightedRows((prev) => {
+                        const copy = { ...prev };
+                        delete copy[payload.subscriptionId];
+                        return copy;
+                    });
+                }, 4000);
+
+                fetchOrders();
+            }
+        };
+
+        window.addEventListener("ADMIN_UPDATE", handler);
+        return () =>
+            window.removeEventListener("ADMIN_UPDATE", handler);
+    }, []);
 
     if (loading) {
         return (
@@ -154,8 +252,8 @@ const AdminOrders = () => {
                                 key={f.key}
                                 onClick={() => setFilter(f.key)}
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${filter === f.key
-                                        ? "bg-linear-to-br from-[#4B0C37] to-[#119DA4] text-white shadow-lg"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-linear-to-br from-[#4B0C37] to-[#119DA4] text-white shadow-lg"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                     }`}
                             >
                                 {f.label}
@@ -178,10 +276,58 @@ const AdminOrders = () => {
                 </div>
             ) : (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    {selectedSubs.length > 0 && (
+                        <div className="mb-4 p-4 rounded-xl bg-slate-100 flex gap-3 items-center">
+                            <span className="text-sm font-medium">
+                                {selectedSubs.length} subscription(s) selected
+                            </span>
+
+                            <button
+                                onClick={() =>
+                                    setBulkConfirm({
+                                        title: "Pause Subscriptions",
+                                        message: `Pause ${selectedSubs.length} subscription(s)?`,
+                                        action: () => bulkAction("pause"),
+                                    })
+                                }
+                                className="px-3 py-1.5 text-xs bg-yellow-500 text-white rounded-lg"
+                            >
+                                Pause
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    setBulkConfirm({
+                                        title: "Resume Subscriptions",
+                                        message: `Resume ${selectedSubs.length} subscription(s)?`,
+                                        action: () => bulkAction("resume"),
+                                    })
+                                }
+                                className="px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg"
+                            >
+                                Resume
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    setBulkConfirm({
+                                        title: "Cancel Subscriptions",
+                                        message: `Cancel ${selectedSubs.length} subscription(s)? This cannot be undone.`,
+                                        danger: true,
+                                        action: () => bulkAction("cancel"),
+                                    })
+                                }
+                                className="px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-linear-to-br from-[#119DA4] to-[#FDE789] text-white">
-                                <tr>
+                                <tr className="transition-all duration-700">
                                     <th className="px-6 py-4 text-left font-semibold">Order ID</th>
                                     <th className="px-6 py-4 text-left font-semibold">Customer</th>
                                     <th className="px-6 py-4 text-left font-semibold">Contact</th>
@@ -189,7 +335,29 @@ const AdminOrders = () => {
                                     <th className="px-6 py-4 text-left font-semibold">Amount</th>
                                     <th className="px-6 py-4 text-left font-semibold">Status</th>
                                     <th className="px-6 py-4 text-left font-semibold">Date</th>
+                                    <th className="px-4 py-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                paginatedOrders
+                                                    .filter(o => o.type === "subscription" && o.subscription?.status !== "cancelled")
+                                                    .every(o => o.subscription && selectedSubs.includes(o.subscription._id))
+                                            }
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    const allIds = paginatedOrders
+                                                        .filter(o => o.type === "subscription" && o.subscription?.status !== "cancelled")
+                                                        .map(o => o.subscription._id);
+                                                    setSelectedSubs(allIds);
+                                                } else {
+                                                    setSelectedSubs([]);
+                                                }
+                                            }}
+                                        />
+
+                                    </th>
                                     <th className="px-6 py-4 text-left font-semibold">Actions</th>
+
                                 </tr>
                             </thead>
 
@@ -220,9 +388,9 @@ const AdminOrders = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                                                    order.status === 'refunded' ? 'bg-red-100 text-red-800' :
-                                                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                order.status === 'refunded' ? 'bg-red-100 text-red-800' :
+                                                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {order.status}
                                             </span>
@@ -232,15 +400,102 @@ const AdminOrders = () => {
                                             <br />
                                             <span className="text-xs">{new Date(order.createdAt).toLocaleTimeString()}</span>
                                         </td>
+                                        <td className="px-4 py-3">
+                                            {order.type === "subscription" &&
+                                                order.subscription?.status !== "cancelled" && (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedSubs.includes(order.subscription._id)}
+                                                        onChange={() =>
+                                                            toggleSelectSub(order.subscription._id)
+                                                        }
+                                                    />
+                                                )}
+                                        </td>
+
                                         <td className="px-6 py-4">
+                                            {/* Meal Order Cancel */}
                                             {order.type === "meal" && order.status === "paid" && (
                                                 <button
                                                     onClick={() => cancelOrder(order._id)}
-                                                    className="px-4 py-2 bg-linear-to-br from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 text-sm font-medium shadow-sm hover:shadow-md"
+                                                    className="px-4 py-2 bg-linear-to-br from-red-500 to-red-600 text-white rounded-lg text-sm font-medium"
                                                 >
                                                     Cancel Order
                                                 </button>
                                             )}
+
+                                            {/* Subscription Controls */}
+                                            {order.type === "subscription" && order.subscription && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {/* Pause */}
+                                                    {order.subscription.status === "active" && (
+                                                        <button
+                                                            disabled={processingId === order.subscription._id}
+                                                            onClick={() =>
+                                                                setConfirm({
+                                                                    title: "Pause Subscription",
+                                                                    message: "Pause this subscription?",
+                                                                    action: () =>
+                                                                        runSubscriptionAction(
+                                                                            order.subscription._id,
+                                                                            "pause",
+                                                                            "Subscription paused"
+                                                                        ),
+                                                                })
+                                                            }
+                                                            className="px-3 py-1.5 text-xs bg-yellow-500 text-white rounded-lg"
+                                                        >
+                                                            Pause
+                                                        </button>
+                                                    )}
+
+                                                    {/* Resume */}
+                                                    {order.subscription.status === "paused" && (
+                                                        <button
+                                                            disabled={processingId === order.subscription._id}
+                                                            onClick={() =>
+                                                                setConfirm({
+                                                                    title: "Resume Subscription",
+                                                                    message: "Resume this subscription?",
+                                                                    action: () =>
+                                                                        runSubscriptionAction(
+                                                                            order.subscription._id,
+                                                                            "resume",
+                                                                            "Subscription resumed"
+                                                                        ),
+                                                                })
+                                                            }
+                                                            className="px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg"
+                                                        >
+                                                            Resume
+                                                        </button>
+                                                    )}
+
+                                                    {/* Cancel */}
+                                                    {order.subscription.status !== "cancelled" && (
+                                                        <button
+                                                            disabled={processingId === order.subscription._id}
+                                                            onClick={() =>
+                                                                setConfirm({
+                                                                    title: "Cancel Subscription",
+                                                                    message: "This action cannot be undone.",
+                                                                    danger: true,
+                                                                    action: () =>
+                                                                        runSubscriptionAction(
+                                                                            order.subscription._id,
+                                                                            "cancel",
+                                                                            "Subscription cancelled"
+                                                                        ),
+                                                                })
+                                                            }
+                                                            className="px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+
                                         </td>
                                     </tr>
                                 ))}
@@ -277,6 +532,15 @@ const AdminOrders = () => {
                     )}
                 </div>
             )}
+            <ConfirmActionModal
+                open={!!bulkConfirm}
+                title={bulkConfirm?.title}
+                message={bulkConfirm?.message}
+                danger={bulkConfirm?.danger}
+                onConfirm={bulkConfirm?.action}
+                onClose={() => setBulkConfirm(null)}
+            />
+
         </div>
     );
 };

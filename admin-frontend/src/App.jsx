@@ -7,6 +7,9 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import Layout from "./components/Layout";
 import DeliveryLogs from "./pages/DeliveryLogs";
+import Analytics from "./pages/Analytics";
+import CustomizationRequests from "./pages/CustomizationRequests";
+import Controls from "./pages/Controls";
 
 const App = () => {
   return (
@@ -20,6 +23,33 @@ const App = () => {
             <Layout>
               <AdminUsers />
             </Layout>
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/customizations"
+        element={
+          <AdminProtectedRoute>
+            <CustomizationRequests />
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/controls"
+        element={
+          <AdminProtectedRoute>
+            <Controls />
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/analytics"
+        element={
+          <AdminProtectedRoute>
+            <Analytics />
           </AdminProtectedRoute>
         }
       />

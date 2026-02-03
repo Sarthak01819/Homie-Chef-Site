@@ -1,58 +1,64 @@
-import { ArrowRight } from "lucide-react";
-import React from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
-    return (
-        <motion.section
-            className="relative w-full min-h-screen bg-cover bg-center"
-            style={{
-                backgroundImage: `url(/images/veg.png)`,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ 
-                opacity: 1,
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-            }}
-            transition={{ 
-                opacity: { duration: 0.5 },
-                backgroundPosition: { duration: 20, repeat: Infinity, ease: "linear" }
-            }}
+  const navigate = useNavigate();
+
+  return (
+    <section className="min-h-[90vh] flex items-center px-6 bg-white">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+
+        {/* LEFT: TEXT */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
         >
-            {/* Optional overlay for readability */}
-            <div className="absolute inset-0 bg-linear-to-r from-[#119DA4]/20 to-[#4B0C37]/20"></div>
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight text-gray-900 mb-6">
+            Healthy Meals.
+            <br />
+            Delivered Daily.
+          </h1>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 flex items-center min-h-screen">
-                <div className="max-w-xl text-black/85 drop-shadow-2xl">
-                    <span className="block text-2xl sm:text-3xl md:text-4xl font-semibold leading-0">
-                        Welcome to
-                    </span>
+          <p className="text-lg text-gray-600 mb-8 max-w-xl">
+            Homely, nutritious vegetarian meals delivered to your door.
+            No daily ordering. No compromise on health.
+          </p>
 
-                    <span className="block text-4xl sm:text-5xl md:text-7xl font-extrabold uppercase leading-tight">
-                        Homie Chef
-                    </span>
+          <div className="flex gap-4">
+            <button
+              onClick={() => navigate("/subscription")}
+              className="px-8 py-4 rounded-full bg-black text-white font-semibold hover:scale-105 transition"
+            >
+              View Subscription Plans
+            </button>
 
-                    <p className="mt-4 text-sm sm:text-base md:text-lg text-black/80">
-                        Delicious meals delivered to your doorstep.
-                        <br />
-                        Freshly prepared by local chefs, made with love and quality
-                        ingredients. Enjoy a variety of cuisines and experience home-cooked
-                        goodness every day.
-                    </p>
+            <button
+              onClick={() => navigate("/discover-meals")}
+              className="px-8 py-4 rounded-full border border-gray-300 font-semibold hover:bg-gray-100 transition"
+            >
+              Explore Meals
+            </button>
+          </div>
+        </motion.div>
 
-                    <Link to="/login">
-                        <motion.button 
-                            className="cursor-pointer mt-8 inline-flex items-center gap-2 bg-linear-to-r from-[#4B0C37] to-[#119DA4] text-white px-6 py-3 rounded-full text-base md:text-lg font-medium hover:from-[#119DA4] hover:to-[#4B0C37] transition-all duration-300 shadow-lg hover:shadow-xl"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            Get Started <ArrowRight className="h-5 w-5" />
-                        </motion.button>
-                    </Link>
-                </div>
-            </div>
-        </motion.section>
-    );
+        {/* RIGHT: IMAGE */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative"
+        >
+          <img
+            src="/images/veg.png"
+            alt="Healthy food"
+            className="rounded-3xl shadow-2xl w-full"
+          />
+        </motion.div>
+
+      </div>
+    </section>
+  );
 };
 
 export default Hero;

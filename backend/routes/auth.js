@@ -30,7 +30,7 @@ const adminCookieOptions = {
     httpOnly: true,
     secure: IS_PROD,
     sameSite: IS_PROD ? "none" : "lax",
-    path: "/admin", // 👈 admin isolation
+    path: "/", // 👈 admin isolation
 };
 
 /* =========================

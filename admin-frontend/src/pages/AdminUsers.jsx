@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import ConfirmActionModal from "../components/ConfirmActionModal";
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
@@ -7,7 +8,39 @@ const AdminUsers = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [confirm, setConfirm] = useState(null);
+    const [processingId, setProcessingId] = useState(null);
+
     const usersPerPage = 10;
+
+    const forceLogoutUser = async (userId) => {
+        try {
+            setProcessingId(userId);
+
+            const res = await fetch(
+                `${import.meta.env.VITE_API_URL}/admin/controls/users/${userId}/force-logout`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Force logout failed");
+            }
+
+            toast.success("User logged out from all devices");
+            setConfirm(null);
+            fetchUsers();
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
     /* =========================
        FETCH ALL USERS
@@ -112,8 +145,8 @@ const AdminUsers = () => {
                                 key={f.key}
                                 onClick={() => setRoleFilter(f.key)}
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${roleFilter === f.key
-                                        ? "bg-linear-to-br from-[#4B0C37] to-[#119DA4] text-white shadow-lg"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-linear-to-br from-[#4B0C37] to-[#119DA4] text-white shadow-lg"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                     }`}
                             >
                                 {f.label}
@@ -138,6 +171,7 @@ const AdminUsers = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
+
                             <thead className="bg-linear-to-br from-[#119DA4] to-[#FDE789] text-white">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold">User</th>
@@ -145,7 +179,9 @@ const AdminUsers = () => {
                                     <th className="px-6 py-4 text-left font-semibold">Role</th>
                                     <th className="px-6 py-4 text-left font-semibold">Status</th>
                                     <th className="px-6 py-4 text-left font-semibold">Joined</th>
-                                    <th className="px-6 py-4 text-left font-semibold">Last Active</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Last Updated</th>
+                                    <th className="px-6 py-4 text-left font-semibold">Actions</th>
+
                                 </tr>
                             </thead>
 
@@ -173,8 +209,8 @@ const AdminUsers = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
-                                                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                                                    : 'bg-blue-100 text-blue-800 border border-blue-200'
+                                                ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                                : 'bg-blue-100 text-blue-800 border border-blue-200'
                                                 }`}>
                                                 {user.role === "admin" ? "Administrator" : "Customer"}
                                             </span>
@@ -192,10 +228,37 @@ const AdminUsers = () => {
                                         <td className="px-6 py-4 text-sm text-gray-600">
                                             {new Date(user.updatedAt || user.createdAt).toLocaleDateString()}
                                         </td>
+                                        <td className="px-6 py-4">
+                                            {user.role !== "admin" && (
+                                                <button
+                                                    onClick={() =>
+                                                        setConfirm({
+                                                            title: "Force Logout User",
+                                                            message: "This will log the user out from all devices immediately.",
+                                                            danger: true,
+                                                            action: () => forceLogoutUser(user._id),
+                                                        })
+                                                    }
+                                                    disabled={processingId === user._id}
+                                                    className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:opacity-90 disabled:opacity-50"
+                                                >
+                                                    {processingId === user._id ? "Processing..." : "Force Logout"}
+                                                </button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
+
                         </table>
+                        <ConfirmActionModal
+                            open={!!confirm}
+                            title={confirm?.title}
+                            message={confirm?.message}
+                            danger
+                            onConfirm={confirm?.action}
+                            onClose={() => setConfirm(null)}
+                        />
                     </div>
 
                     {/* Pagination */}

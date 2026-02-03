@@ -12,6 +12,9 @@ import mealRoutes from "./routes/meals.js";
 import orderRoutes from "./routes/orders.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import paymentRoutes from "./routes/payments.js";
+import adminAnalyticsRoutes from "./routes/admin.analytics.js";
+import adminControlsRoutes from "./routes/admin.controls.js";
+import adminRealtimeRoutes from "./routes/admin.realtime.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger } from "./middleware/requestLogger.js";
@@ -87,18 +90,6 @@ app.use(
 );
 
 /* =========================
-   🚦 RATE LIMIT
-========================= */
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
-
-/* =========================
    BODY & COOKIE PARSERS
 ========================= */
 app.use(express.json({ limit: "10kb" }));
@@ -129,23 +120,57 @@ app.use(
   })
 );
 
-// ✅ MUST be before routes
-app.options("*", cors());
-
 /* =========================
    🧾 REQUEST LOGGING
 ========================= */
 app.use(requestLogger);
 
 /* =========================
+   🚦 GENERAL API RATE LIMIT
+========================= */
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300, // normal browsing
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(apiLimiter);
+
+/* =========================
+   🔐 AUTH RATE LIMIT
+========================= */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: IS_PROD ? 5 : 50, // 👈 KEY LINE
+  message: {
+    message: "Too many login attempts. Please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const adminActionLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+  message: { message: "Too many admin actions. Slow down." },
+});
+
+app.use("/admin/controls", adminActionLimiter);
+
+
+/* =========================
    🚀 ROUTES
 ========================= */
-app.use("/auth", authRoutes);
+app.use("/auth", authLimiter, authRoutes);
 app.use("/meals", mealRoutes);
 app.use("/orders", orderRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/admin", adminRoutes);
+app.use("/admin/analytics", adminAnalyticsRoutes);
+app.use("/admin/controls", adminControlsRoutes);
+app.use("/admin/realtime", adminRealtimeRoutes);
 
 /* =========================
    ❤️ HEALTH CHECK

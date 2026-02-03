@@ -1,43 +1,60 @@
 import { useEffect, useState } from "react";
 import { Users, ShoppingBag, IndianRupee, Calendar, TrendingUp, Activity, Zap, Award, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
+import StatCard from "../components/StatCard.jsx";
+import { useAdminRealtime } from "../context/AdminRealtimeContext";
+import AdminActivityFeed from "../components/AdminActivityFeed";
 
-const StatCard = ({ icon, label, value, trend, color, delay = 0 }) => (
-    <div className={`bg-linear-to-br ${color} rounded-3xl shadow-2xl p-8 text-white relative overflow-hidden group hover:shadow-3xl hover:scale-105 transition-all duration-500 hover:-translate-y-2 animate-fade-in-up`} style={{ animationDelay: `${delay}ms` }}>
-        {/* Animated Background Shapes */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12 group-hover:scale-125 transition-transform duration-700 delay-100"></div>
 
-        {/* Floating Particles */}
-        <div className="absolute top-4 right-4 w-2 h-2 bg-white/30 rounded-full animate-bounce delay-300"></div>
-        <div className="absolute top-8 right-8 w-1 h-1 bg-white/20 rounded-full animate-bounce delay-500"></div>
-        <div className="absolute bottom-6 left-6 w-1.5 h-1.5 bg-white/25 rounded-full animate-bounce delay-700"></div>
+// const StatCard = ({ icon, label, value, trend, color, delay = 0 }) => (
+//     <div className={`bg-linear-to-br ${color} rounded-3xl shadow-2xl p-8 text-white relative overflow-hidden group hover:shadow-3xl hover:scale-105 transition-all duration-500 hover:-translate-y-2 animate-fade-in-up`} style={{ animationDelay: `${delay}ms` }}>
+//         {/* Animated Background Shapes */}
+//         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
+//         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12 group-hover:scale-125 transition-transform duration-700 delay-100"></div>
 
-        <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6">
-                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
-                    {icon}
-                </div>
-                {trend && (
-                    <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm ${trend > 0 ? 'bg-green-500/20 text-green-100 border border-green-400/30' : 'bg-red-500/20 text-red-100 border border-red-400/30'
-                        }`}>
-                        <TrendingUp className="w-3 h-3" />
-                        {trend > 0 ? '+' : ''}{trend}%
-                    </div>
-                )}
-            </div>
-            <div>
-                <p className="text-sm font-medium text-white/80 mb-2 uppercase tracking-wider">{label}</p>
-                <p className="text-4xl font-black mb-1 group-hover:scale-110 transition-transform duration-300">{value}</p>
-                <div className="w-12 h-1 bg-white/30 rounded-full group-hover:w-20 transition-all duration-500"></div>
-            </div>
-        </div>
-    </div>
-);
+//         {/* Floating Particles */}
+//         <div className="absolute top-4 right-4 w-2 h-2 bg-white/30 rounded-full animate-bounce delay-300"></div>
+//         <div className="absolute top-8 right-8 w-1 h-1 bg-white/20 rounded-full animate-bounce delay-500"></div>
+//         <div className="absolute bottom-6 left-6 w-1.5 h-1.5 bg-white/25 rounded-full animate-bounce delay-700"></div>
+
+//         <div className="relative z-10">
+//             <div className="flex items-center justify-between mb-6">
+//                 <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300 group-hover:scale-110">
+//                     {icon}
+//                 </div>
+//                 {trend && (
+//                     <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm ${trend > 0 ? 'bg-green-500/20 text-green-100 border border-green-400/30' : 'bg-red-500/20 text-red-100 border border-red-400/30'
+//                         }`}>
+//                         <TrendingUp className="w-3 h-3" />
+//                         {trend > 0 ? '+' : ''}{trend}%
+//                     </div>
+//                 )}
+//             </div>
+//             <div>
+//                 <p className="text-sm font-medium text-white/80 mb-2 uppercase tracking-wider">{label}</p>
+//                 <p className="text-4xl font-black mb-1 group-hover:scale-110 transition-transform duration-300">{value}</p>
+//                 <div className="w-12 h-1 bg-white/30 rounded-full group-hover:w-20 transition-all duration-500"></div>
+//             </div>
+//         </div>
+//     </div>
+// );
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [analytics, setAnalytics] = useState(null);
+const { stats: liveStats } = useAdminRealtime();
+
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_URL}/admin/analytics`, {
+            credentials: "include",
+        })
+            .then((r) => r.json())
+            .then(setAnalytics)
+            .catch(() => setAnalytics(null));
+    }, []);
+
+    const s = analytics?.summary;
 
     const fetchStats = async () => {
         try {
@@ -110,43 +127,18 @@ const AdminDashboard = () => {
 
                 {/* Enhanced Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                        <StatCard
-                            icon={<Users size={24} />}
-                            label="Total Users"
-                            value={stats.totalUsers}
-                            trend={12}
-                            color="from-blue-500 to-blue-600"
-                        />
-                    </div>
-
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        <StatCard
-                            icon={<ShoppingBag size={24} />}
-                            label="Total Orders"
-                            value={stats.totalOrders}
-                            trend={8}
-                            color="from-green-500 to-green-600"
-                        />
-                    </div>
-
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                        <StatCard
-                            icon={<IndianRupee size={24} />}
-                            label="Total Revenue"
-                            value={`₹${stats.totalRevenue}`}
-                            trend={15}
-                            color="from-purple-500 to-purple-600"
-                        />
-                    </div>
+                    <StatCard label="Total Users" value={s?.totalUsers ?? 0} />
+                    <StatCard label="Active Subs" value={s?.activeSubscriptions ?? 0} />
+                    <StatCard label="Orders Today" value={s?.ordersToday ?? 0} />
+                    <StatCard label="Revenue Today" value={`₹${s?.revenueToday ?? 0}`} />
 
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                         <StatCard
                             icon={<Calendar size={24} />}
                             label="Active Subscriptions"
-                            value={stats.activeSubscriptions}
+                            value={stats?.activeSubscriptions ?? 0}
                             trend={-2}
-                            color="from-orange-500 to-orange-600"
+                            color="from-orange-500 to-orange-600"   
                         />
                     </div>
                 </div>
