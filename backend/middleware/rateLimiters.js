@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 /* =========================
    AUTH ROUTES (STRICT)
@@ -50,16 +50,17 @@ export const adminAuthLimiter = rateLimit({
 
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 8,
+  max: process.env.APP_MODE === "production" ? 5 : 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     message: "Too many login attempts. Please try again later.",
   },
   keyGenerator: (req) => {
+    // email-based limiting first, IP fallback (IPv6 safe)
     return (
       req.body?.email?.toLowerCase() ||
-      req.ip
+      ipKeyGenerator(req)
     );
   },
 });
