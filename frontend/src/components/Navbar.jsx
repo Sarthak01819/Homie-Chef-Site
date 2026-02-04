@@ -194,7 +194,7 @@ const Navbar = () => {
                 <MobileItem to="/profile" text="Profile" onClick={closeAll} />
                 <MobileItem to="/active-subscription" text="My Subscription" onClick={closeAll} />
                 <MobileItem to="/orders" text="Order History" onClick={closeAll} />
-
+                <MobileItem to="/tracker" text="Track" onClick={closeAll} />
                 <motion.button
                   onClick={handleLogout}
                   disabled={loggingOut}
