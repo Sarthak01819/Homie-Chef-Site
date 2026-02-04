@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.js";
@@ -45,12 +47,12 @@ requiredEnv.forEach((key) => {
 });
 
 /* =========================
-   🛡️ SENTRY INIT (v8 SAFE)
+   🛡️ SENTRY INIT
 ========================= */
 initSentry();
 
 /* =========================
-   🧨 PROCESS-LEVEL SAFETY
+   🧨 PROCESS SAFETY
 ========================= */
 process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED PROMISE REJECTION:", err);
@@ -60,11 +62,11 @@ process.on("unhandledRejection", (err) => {
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION:", err);
   Sentry.captureException(err);
-  process.exit(1); // fail fast
+  process.exit(1);
 });
 
 /* =========================
-   🔐 HELMET HARDENING (H3.1)
+   🔐 HELMET
 ========================= */
 app.use(
   helmet({
@@ -91,19 +93,17 @@ app.use(
 );
 
 /* =========================
-   BODY & COOKIE PARSERS
+   BODY & COOKIES
 ========================= */
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
 /* =========================
-   🌍 CORS CONFIG
+   🌍 CORS
 ========================= */
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_FRONTEND_URL,
-
-  // Always allow local dev frontends
   "http://localhost:5173",
   "http://localhost:5174",
 ];
@@ -122,20 +122,19 @@ app.use(
 );
 
 /* =========================
-   🧾 REQUEST LOGGING
+   🧾 LOGGING
 ========================= */
 app.use(requestLogger);
 
 /* =========================
-   🚦 GENERAL API RATE LIMIT
+   🚦 API RATE LIMIT
 ========================= */
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300, // normal browsing
+  max: 300,
   standardHeaders: true,
   legacyHeaders: false,
 });
-
 app.use(apiLimiter);
 
 /* =========================
@@ -143,7 +142,7 @@ app.use(apiLimiter);
 ========================= */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: IS_PROD ? 5 : 50, // 👈 KEY LINE
+  max: IS_PROD ? 5 : 50,
   message: {
     message: "Too many login attempts. Please try again later.",
   },
@@ -159,9 +158,8 @@ const adminActionLimiter = rateLimit({
 
 app.use("/admin/controls", adminActionLimiter);
 
-
 /* =========================
-   🚀 ROUTES
+   🚀 API ROUTES
 ========================= */
 app.use("/auth", authLimiter, authRoutes);
 app.use("/meals", mealRoutes);
@@ -174,7 +172,7 @@ app.use("/admin/controls", adminControlsRoutes);
 app.use("/admin/realtime", adminRealtimeRoutes);
 
 /* =========================
-   ❤️ HEALTH CHECK
+   ❤️ HEALTH
 ========================= */
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -186,8 +184,21 @@ app.get("/health", (req, res) => {
 });
 
 /* =========================
-   ❗ GLOBAL ERROR HANDLER
-   (Sentry v8 compatible)
+   🟢 SPA FALLBACK (FIX)
+========================= */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// serve frontend build
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// React Router reload support
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
+/* =========================
+   ❗ ERROR HANDLER
 ========================= */
 app.use((err, req, res, next) => {
   console.error("🔥 UNHANDLED ERROR:", err);
