@@ -224,10 +224,10 @@ const Subscription = () => {
             <button
               key={d}
               onClick={() => setDuration(d)}
-              className={`px-5 py-2 rounded-xl border ${
+              className={`px-5 py-2 rounded-xl border cursor-pointer ${
                 duration === d
                   ? "bg-green-800/80 text-white"
-                  : "bg-white"
+                  : "bg-white hover:bg-green-200/60"
               }`}
             >
               {d} Days

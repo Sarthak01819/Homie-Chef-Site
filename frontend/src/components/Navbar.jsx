@@ -82,13 +82,7 @@ const Navbar = () => {
             <NavItem to="/" icon={<Home size={18} />} text="Home" />
             <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
             <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
-            {user && (
-              <NavItem
-                to="/tracker"
-                icon={<BadgeCheck size={18} />}
-                text="Track"
-              />
-            )}
+            <NavItem to="/tracker" icon={<BadgeCheck size={18} />} text="Track" />
           </div>
         </div>
 
@@ -217,17 +211,12 @@ const NavItem = ({ to, icon, text, highlight }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `px-4 py-2 rounded-xl shadow-xl bg-[#916743] flex items-center gap-2 transition-all ${isActive || highlight ? "text-white" : "text-white/90"
-      }`
+      `relative px-4 py-2 rounded-xl shadow-xl bg-[#916743] flex items-center gap-2 transition-all cursor-pointer ${isActive || highlight ? "text-white" : "text-white/90"}`
     }
-    style={({ isActive }) =>
-      isActive || highlight
-        ? { backgroundColor: "#000000" }
-        : {}
-    }
+    style={({ isActive }) => (isActive || highlight ? { backgroundColor: "#000000" } : {})}
   >
-    {icon}
-    {text}
+    <span className="pointer-events-auto">{icon}</span>
+    {text && <span className="pointer-events-auto">{text}</span>}
   </NavLink>
 );
 
@@ -238,8 +227,8 @@ const DropdownItem = ({ to, icon, text, onClick }) => (
     onClick={onClick}
     className="flex items-center gap-2 px-4 py-3 hover:bg-green-50 transition"
   >
-    {icon}
-    {text}
+    <span className="pointer-events-auto">{icon}</span>
+    <span className="pointer-events-auto">{text}</span>
   </NavLink>
 );
 
@@ -249,16 +238,11 @@ const MobileItem = ({ to, text, highlight, onClick }) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `px-4 py-3 rounded-xl transition shadow-xl ${isActive || highlight ? "text-white" : "text-white/90"
-      }`
+      `px-4 py-3 rounded-xl transition shadow-xl ${isActive || highlight ? "text-white" : "text-white/90"}`
     }
-    style={({ isActive }) =>
-      isActive || highlight
-        ? { backgroundColor: "#000000" }
-        : {}
-    }
+    style={({ isActive }) => (isActive || highlight ? { backgroundColor: "#000000" } : {})}
   >
-    {text}
+    <span className="pointer-events-auto">{text}</span>
   </NavLink>
 );
 
