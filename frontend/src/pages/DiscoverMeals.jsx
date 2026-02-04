@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ErrorState from "../components/ErrorState";
-import SubscriptionPromo from "../components/SubscriptionPromo";
-
 
 /* =========================
    STAR RATING COMPONENT
 ========================= */
-const StarRating = ({ value, onRate }) => {
+const StarRating = memo(({ value, onRate }) => {
   return (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -26,12 +24,12 @@ const StarRating = ({ value, onRate }) => {
       ))}
     </div>
   );
-};
+});
 
 /* =========================
    MEAL CARD
 ========================= */
-const MealCard = ({ meal }) => {
+const MealCard = memo(({ meal }) => {
   const { user, setUser } = useAuth();
 
   const isLiked = user?.favourites?.some((fav) =>
@@ -50,7 +48,7 @@ const MealCard = ({ meal }) => {
     user?.ratings?.find((r) => r.mealId === meal._id)?.rating || 0;
 
   /* ❤️ Toggle Favourite */
-  const toggleLike = async () => {
+  const toggleLike = useCallback(async () => {
     if (!user) return toast.error("Login to like meals");
 
     const res = await fetch(
@@ -66,10 +64,10 @@ const MealCard = ({ meal }) => {
       ...user,
       favourites: data.favourites.map((id) => id.toString()),
     });
-  };
+  }, [meal._id, user, setUser]);
 
   /* 🛒 Add to Cart */
-  const addToCart = async () => {
+  const addToCart = useCallback(async () => {
     if (!user) return toast.error("Login to add items to cart");
 
     try {
@@ -95,10 +93,10 @@ const MealCard = ({ meal }) => {
     } catch {
       toast.error("Something went wrong");
     }
-  };
+  }, [meal._id, user, setUser]);
 
   /* ⭐ Rate Meal */
-  const rateMeal = async (rating) => {
+  const rateMeal = useCallback(async (rating) => {
     if (!user) return toast.error("Login to rate meals");
 
     const res = await fetch(
@@ -122,7 +120,7 @@ const MealCard = ({ meal }) => {
     });
 
     meal.avgRating = data.avgRating;
-  };
+  }, [meal, user, setUser]);
 
   return (
     <motion.div
@@ -159,6 +157,7 @@ const MealCard = ({ meal }) => {
       <img
         src={meal.image}
         alt={meal.name}
+        loading="lazy"
         className="
       object-cover
       w-32 h-32
@@ -236,7 +235,7 @@ const MealCard = ({ meal }) => {
     </motion.div>
 
   );
-};
+});
 
 /* =========================
    MAIN PAGE
@@ -247,20 +246,31 @@ const DiscoverMeals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchMeals = async () => {
+  const fetchMeals = useCallback(async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/meals`);
       const data = await res.json();
       setMeals(data);
     } catch (err) {
       console.error("Failed to fetch meals", err);
+      setError({ 
+        type: "network", 
+        message: "Failed to load meals. Please try again." 
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
   useEffect(() => {
     fetchMeals();
-  }, []);
+  }, [fetchMeals]);
+
+  // Filter meals based on selected meal type (lunch/dinner show only veg)
+  const filteredMeals = useMemo(() => {
+    if (filter === "breakfast") return []; // Breakfast shows "Coming Soon!"
+    return meals.filter((meal) => (meal.category || meal.type) === "veg"); // Lunch and Dinner show only veg
+  }, [filter, meals]);
 
   if (error) {
     return (
@@ -274,12 +284,6 @@ const DiscoverMeals = () => {
       />
     );
   }
-
-  // Filter meals based on selected meal type (lunch/dinner show only veg)
-  const filteredMeals =
-    filter === "breakfast"
-      ? [] // Breakfast shows "Coming Soon!"
-      : meals.filter((meal) => (meal.category || meal.type) === "veg"); // Lunch and Dinner show only veg
 
   if (loading) return <Loader text="Loading meals..." />;
 
