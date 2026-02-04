@@ -53,7 +53,7 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className="fixed top-0 left-0 w-full z-50 bg-linear-to-r backdrop-blur-2xl border-b shadow-xl"
+      className="fixed top-0 left-0 w-full z-50 backdrop-blur-2xl border-b shadow-xl"
       style={{
         background: "var(--brand-wood-gradient)",
         borderColor: "rgba(15,23,42,0.08)",
@@ -62,79 +62,74 @@ const Navbar = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="w-full px-5 py-3 flex items-center">
-        {/* Logo */}
-        <div className="w-1/3">
+      {/* ================= DESKTOP BAR ================= */}
+      <div className="max-w-7xl mx-auto w-full px-5 py-3 flex items-center">
+
+        {/* ---------- LEFT : LOGO ---------- */}
+        <div className="w-1/3 flex justify-start">
           <NavLink to="/" onClick={closeAll}>
             <img
-              className="h-10 sm:h-12 leading-1 w-auto"
+              className="h-10 sm:h-12 w-auto"
               src="/images/logo3.png"
               alt="Homie Chef Logo"
             />
           </NavLink>
         </div>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex font-medium gap-4 justify-between w-1/3"
-          style={{ borderColor: "rgba(15,23,42,0.15)" }}
-        >
-          <NavItem to="/" icon={<Home size={18} />} text="Home" />
-          <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
-          <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
-          {user && (<NavItem
-            to="/tracker"
+        {/* ---------- CENTER : MAIN NAV ---------- */}
+        <div className="hidden md:flex w-1/3 justify-center">
+          <div className="flex gap-6 font-medium">
+            <NavItem to="/" icon={<Home size={18} />} text="Home" />
+            <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
+            <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
+            {user && (
+              <NavItem
+                to="/tracker"
+                icon={<BadgeCheck size={18} />}
+                text="Track"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* ---------- RIGHT : ACTIONS ---------- */}
+        <div className="hidden md:flex w-1/3 justify-end items-center gap-4">
+
+          {/* Cart */}
+          <NavItem
+            to="/cart"
             icon={
               <div className="relative">
-                <BadgeCheck size={18} />
-                {favouriteCount > 0 && (
+                <ShoppingCart size={18} />
+                {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
-                    {favouriteCount}
+                    {cartCount}
                   </span>
                 )}
               </div>
             }
-            text="Track"
+            text=""
           />
-          )}
-        </div>
 
-        <div className="hidden md:flex font-medium gap-4 items-center justify-end w-1/3">
-          <motion.div className="flex gap-4 items-center ">
+          {/* Favourites */}
+          {user && (
             <NavItem
-              to="/cart"
+              to="/favourites"
               icon={
                 <div className="relative">
-                  <ShoppingCart size={18} />
-                  {cartCount > 0 && (
+                  <Heart size={18} />
+                  {favouriteCount > 0 && (
                     <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
-                      {cartCount}
+                      {favouriteCount}
                     </span>
                   )}
                 </div>
               }
               text=""
             />
+          )}
 
-            {user && (
-              <>
-                <NavItem
-                  to="/favourites"
-                  icon={
-                    <div className="relative">
-                      <Heart size={18} />
-                      {favouriteCount > 0 && (
-                        <span className="absolute -top-2 -right-2 text-[10px] px-1.5 rounded-full font-semibold bg-green-500 text-white">
-                          {favouriteCount}
-                        </span>
-                      )}
-                    </div>
-                  }
-                  text=""
-                />
-              </>
-            )}
-          </motion.div>
-
+          {/* Profile / Login */}
           {!user ? (
             <NavItem
               to="/login"
@@ -144,16 +139,14 @@ const Navbar = () => {
             />
           ) : (
             <div className="relative">
-              {/* Avatar */}
               <motion.button
                 onClick={() => setDropdown((p) => !p)}
                 whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 px-4 py-4 justify-center rounded-full text-white transition bg-white/20 hover:bg-white/30 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-3 rounded-full text-white bg-white/20 hover:bg-white/30"
               >
-                <User size={22} />
+                <User size={20} />
               </motion.button>
 
-              {/* Dropdown */}
               {dropdown && (
                 <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-xl border bg-white overflow-hidden">
                   <DropdownItem to="/profile" icon={<User size={16} />} text="Profile" onClick={closeAll} />
@@ -175,17 +168,17 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Toggle */}
+        {/* ---------- MOBILE TOGGLE ---------- */}
         <motion.button
           onClick={() => setOpen((p) => !p)}
           whileHover={{ scale: 1.05 }}
-          className="md:hidden text-slate-900"
+          className="md:hidden ml-auto text-slate-900"
         >
           {open ? <X size={26} /> : <Menu size={26} />}
         </motion.button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ================= MOBILE MENU ================= */}
       {open && (
         <div className="md:hidden px-5 pb-4">
           <ul className="flex flex-col gap-3">
@@ -206,7 +199,7 @@ const Navbar = () => {
                   onClick={handleLogout}
                   disabled={loggingOut}
                   whileHover={{ scale: 1.04 }}
-                  className="px-4 py-3 rounded-xl text-black font-medium disabled:opacity-60 border border-red-600/80 bg-red-600 w-full mt-8 active:scale-95"
+                  className="px-4 py-3 rounded-xl text-white font-medium disabled:opacity-60 bg-red-600 w-full mt-6"
                 >
                   {loggingOut ? "Logging out..." : "Logout"}
                 </motion.button>

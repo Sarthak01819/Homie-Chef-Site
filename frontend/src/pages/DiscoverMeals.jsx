@@ -341,9 +341,6 @@ const DiscoverMeals = () => {
             ))}
           </div>
         )}
-        <div className="mt-20">
-          <SubscriptionPromo />
-        </div>
       </motion.div>
     </motion.div>
   );

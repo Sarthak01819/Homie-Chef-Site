@@ -6,12 +6,13 @@ const Footer = () => {
     <motion.footer 
       className="
       w-full
-      bg-white/60
       backdrop-blur-lg
       border-t border-black/30
-      shadow-[0_-4px_20px_rgba(0,0,0,0.03)] 
-      bg-linear-to-r from-[#119DA4]/90 to-[#FDE789]/90 
     "
+    style={{
+        background: "var(--brand-wood-gradient)",
+        borderColor: "rgba(15,23,42,0.08)",
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -23,16 +24,16 @@ const Footer = () => {
             alt="Homie Chef Logo"
             className="h-12 w-auto"
           />
-          <span className="text-lg font-semibold text-black/80 tracking-wide uppercase">
+          <span className="text-lg font-semibold text-white/90 tracking-wide uppercase">
             Homie Chef
           </span>
         </div>
 
-        <p className="text-sm text-black/60 text-center sm:text-right">
+        <p className="text-sm text-white/60 text-center sm:text-right">
           © {new Date().getFullYear()}{' '}
           <Link
             to="/"
-            className="text-black/80 hover:text-green-700 transition underline underline-offset-4"
+            className="text-white/80 hover:text-green-700 transition underline underline-offset-4"
           >
             Homie Chef
           </Link>

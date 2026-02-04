@@ -71,7 +71,7 @@ const Register = () => {
 
   return (
     <motion.div 
-      className="min-h-[70vh] flex items-center justify-center px-4"
+      className="min-h-screen flex items-center justify-center px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
