@@ -47,3 +47,19 @@ export const adminAuthLimiter = rateLimit({
     message: "Admin login rate limit exceeded",
   },
 });
+
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "Too many login attempts. Please try again later.",
+  },
+  keyGenerator: (req) => {
+    return (
+      req.body?.email?.toLowerCase() ||
+      req.ip
+    );
+  },
+});

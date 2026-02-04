@@ -23,6 +23,7 @@ import { initSentry, Sentry } from "./utils/sentry.js";
 dotenv.config(); // ✅ MUST be first
 
 const app = express();
+app.set("trust proxy", 1);
 const IS_PROD = process.env.APP_MODE === "production";
 
 /* =========================
