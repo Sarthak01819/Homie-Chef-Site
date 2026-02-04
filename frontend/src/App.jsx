@@ -62,7 +62,7 @@ function App() {
 
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          {/* 🌍 Public Pages */}
+          
           <Route
             path="/"
             element={
@@ -90,7 +90,6 @@ function App() {
             }
           />
 
-          {/* 🔓 Public-only */}
           <Route
             path="/login"
             element={
@@ -135,7 +134,6 @@ function App() {
             }
           />
 
-          {/* 🔐 Protected Pages */}
           <Route
             path="/profile"
             element={
