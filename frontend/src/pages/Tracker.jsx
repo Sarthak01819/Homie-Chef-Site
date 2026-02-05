@@ -4,6 +4,8 @@ import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
 import CustomizationModal from "../components/CustomizationModal";
+import SubscriptionPage from "../components/SubscriptionPage";
+import TrackerPage from "../components/TrackerPage";
 
 const Tracker = () => {
     /* =========================
@@ -98,7 +100,7 @@ const Tracker = () => {
 
     const days = subscription?.plan?.mealsByDay || [];
     const totalPlanDays = days.length;
-    
+
     // Get meals for selected day
     const selectedDayIndex = Math.min(selectedDay - 1, days.length - 1);
     const selectedDayMeals = days[selectedDayIndex] || null;
@@ -108,7 +110,7 @@ const Tracker = () => {
     ========================= */
     const getDeliveredMacros = (day, dayNumber) => {
         let calories = 0, protein = 0, carbs = 0, fats = 0;
-        
+
         // Only count lunch if delivered
         if (deliveredMeals[`${dayNumber}-lunch`] && day?.lunch?.meal?.macros) {
             calories += day.lunch.meal.macros.calories || 0;
@@ -116,7 +118,7 @@ const Tracker = () => {
             carbs += day.lunch.meal.macros.carbs || 0;
             fats += day.lunch.meal.macros.fats || 0;
         }
-        
+
         // Only count dinner if delivered
         if (deliveredMeals[`${dayNumber}-dinner`] && day?.dinner?.meal?.macros) {
             calories += day.dinner.meal.macros.calories || 0;
@@ -124,7 +126,7 @@ const Tracker = () => {
             carbs += day.dinner.meal.macros.carbs || 0;
             fats += day.dinner.meal.macros.fats || 0;
         }
-        
+
         return { calories, protein, carbs, fats };
     };
 
@@ -196,10 +198,10 @@ const Tracker = () => {
     ========================= */
     const calculateWeeklyTotals = () => {
         if (!days.length) return { calories: 0, protein: 0, carbs: 0, fats: 0 };
-        
+
         let calories = 0, protein = 0, carbs = 0, fats = 0;
         const daysToCalculate = Math.min(days.length, 7);
-        
+
         for (let i = 0; i < daysToCalculate; i++) {
             const dayNumber = days[i].day;
             const macros = getDeliveredMacros(days[i], dayNumber);
@@ -208,7 +210,7 @@ const Tracker = () => {
             carbs += macros.carbs;
             fats += macros.fats;
         }
-        
+
         return { calories, protein, carbs, fats };
     };
 
@@ -301,7 +303,7 @@ const Tracker = () => {
     ========================= */
     const getTotalMacrosForDay = (day) => {
         if (!day) return { calories: 0, protein: 0, carbs: 0, fats: 0 };
-        
+
         const l = day?.lunch?.meal?.macros || {};
         const d = day?.dinner?.meal?.macros || {};
         return {
@@ -341,16 +343,12 @@ const Tracker = () => {
     ========================= */
     return (
         <>
-            <div className="min-h-screen px-4 pb-14 pt-28 bg-linear-to-br from-[#0F1C2E] via-[#162A44] to-[#1F3A5F]">
-                <div className="max-w-5xl mx-auto text-white">
-                    <h1 className="text-4xl font-bold text-center mb-8">
-                        Meal Tracker
-                    </h1>
-
+            <div className="min-h-screen w-full px-4 pb-14 pt-28 bg-linear-to-br from-[#0F1C2E] via-[#162A44] to-[#1F3A5F]">
+                <div className="max-w-7xl mx-auto text-white">
                     {/* Weekly Progress Banner - Only shows delivered meals */}
-                    <div className="bg-linear-to-r from-[#667eea] to-[#764ba2] rounded-2xl p-6 mb-8 shadow-2xl">
-                        <h3 className="text-white text-2xl font-bold mb-6 text-center">
-                            Weekly Progress (Delivered Meals Only)
+                    <div className="bg-linear-to-r py-8 from-[#667eea] to-[#764ba2] rounded-2xl p-6 mb-8 shadow-2xl">
+                        <h3 className="text-white text-4xl font-bold mb-6 text-center">
+                            Weekly Progress
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="text-center">
@@ -378,9 +376,6 @@ const Tracker = () => {
                                 <div className="text-gray-200 font-semibold">Total Fats</div>
                             </div>
                         </div>
-                        <div className="text-center mt-4 text-gray-200 text-sm">
-                            Progress updates only when meals are marked as "Delivered ✓"
-                        </div>
                     </div>
 
                     {reminder && (
@@ -394,7 +389,7 @@ const Tracker = () => {
                         <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
                             <label className="text-white font-semibold text-lg">Select Day:</label>
                             <div className="relative flex-1 min-w-50">
-                                <select 
+                                <select
                                     value={selectedDay}
                                     onChange={(e) => handleDaySelect(parseInt(e.target.value))}
                                     className="w-full px-5 py-3 rounded-xl bg-white/10 border-2 border-white/20 text-white font-semibold cursor-pointer appearance-none focus:outline-none focus:border-yellow-500"
@@ -422,12 +417,9 @@ const Tracker = () => {
                     <div className="bg-linear-to-r from-[#1E293B]/80 to-[#0F172A]/90 rounded-2xl p-6 mb-8 border-l-4 border-yellow-500 shadow-xl">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                             <div>
-                                <h3 className="text-white text-2xl font-bold">
+                                <h3 className="text-white text-2xl font-bold mb-4">
                                     Day {selectedDay} - {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][(selectedDay - 1) % 7]}
                                 </h3>
-                                <div className="text-gray-400 text-sm mt-1">
-                                    Showing delivered meals only
-                                </div>
                             </div>
                             {milestone && (
                                 <span className="px-4 py-2 rounded-full bg-linear-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 font-semibold text-sm">
@@ -435,71 +427,143 @@ const Tracker = () => {
                                 </span>
                             )}
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4">
-                            <div className="text-center">
-                                <div className="text-gray-300 text-sm mb-1">Total Calories</div>
+                            <div className="text-center mb-4">
+                                <div className="text-gray-300 text-lg font-bold mb-1">Total Calories</div>
                                 <div className="text-white text-2xl font-bold">{animated.calories} kcal</div>
-                                <div className="text-gray-400 text-xs">
+                                {/* <div className="text-gray-400 text-xs">
                                     of {getTotalMacrosForDay(selectedDayMeals).calories} kcal
-                                </div>
+                                </div> */}
                             </div>
-                            <div className="text-center">
-                                <div className="text-gray-300 text-sm mb-1">Protein</div>
+                            <div className="text-center mb-4">
+                                <div className="text-gray-300 text-lg font-bold mb-1">Protein</div>
                                 <div className="text-[#6EC1E4] text-2xl font-bold">{animated.protein}g</div>
-                                <div className="text-gray-400 text-xs">
+                                {/* <div className="text-gray-400 text-xs">
                                     of {getTotalMacrosForDay(selectedDayMeals).protein}g
-                                </div>
+                                </div> */}
                             </div>
-                            <div className="text-center">
-                                <div className="text-gray-300 text-sm mb-1">Carbs</div>
+                            <div className="text-center mb-4">
+                                <div className="text-gray-300 text-lg font-bold mb-1">Carbs</div>
                                 <div className="text-[#10B981] text-2xl font-bold">{animated.carbs}g</div>
-                                <div className="text-gray-400 text-xs">
+                                {/* <div className="text-gray-400 text-xs">
                                     of {getTotalMacrosForDay(selectedDayMeals).carbs}g
-                                </div>
+                                </div> */}
                             </div>
-                            <div className="text-center">
-                                <div className="text-gray-300 text-sm mb-1">Fats</div>
+                            <div className="text-center mb-4">
+                                <div className="text-gray-300 text-lg font-bold mb-1">Fats</div>
                                 <div className="text-[#F59E0B] text-2xl font-bold">{animated.fats}g</div>
-                                <div className="text-gray-400 text-xs">
+                                {/* <div className="text-gray-400 text-xs">
                                     of {getTotalMacrosForDay(selectedDayMeals).fats}g
-                                </div>
+                                </div> */}
                             </div>
                         </div>
-                        
+
                         {/* Progress indicator for delivered meals */}
                         <div className="mb-4">
                             <div className="flex justify-between text-gray-300 text-sm mb-1">
                                 <span>Meals Delivered:</span>
                                 <span>
-                                    {(deliveredMeals[`${selectedDayMeals?.day}-lunch`] ? 1 : 0) + 
-                                     (deliveredMeals[`${selectedDayMeals?.day}-dinner`] ? 1 : 0)} of 2
+                                    {(deliveredMeals[`${selectedDayMeals?.day}-lunch`] ? 1 : 0) +
+                                        (deliveredMeals[`${selectedDayMeals?.day}-dinner`] ? 1 : 0)} of 2
                                 </span>
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
+                                <div
                                     className="bg-linear-to-r from-emerald-500 to-green-500 h-2 rounded-full transition-all duration-300"
-                                    style={{ 
-                                        width: `${((deliveredMeals[`${selectedDayMeals?.day}-lunch`] ? 1 : 0) + 
-                                                 (deliveredMeals[`${selectedDayMeals?.day}-dinner`] ? 1 : 0)) / 2 * 100}%` 
+                                    style={{
+                                        width: `${((deliveredMeals[`${selectedDayMeals?.day}-lunch`] ? 1 : 0) +
+                                            (deliveredMeals[`${selectedDayMeals?.day}-dinner`] ? 1 : 0)) / 2 * 100}%`
                                     }}
                                 ></div>
                             </div>
                         </div>
-                        
-                        <div className="text-gray-300 text-sm">
-                            {selectedDay === todayIndex + 1 
+
+                        {/* <div className="text-gray-300 text-sm">
+                            {selectedDay === todayIndex + 1
                                 ? "Today's progress updates as you mark meals as delivered."
                                 : "Mark meals as delivered to track your daily progress."}
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Meals Container */}
                     <div className="space-y-6">
+                        {/* Breakfast Card */}
+                        <div className="bg-linear-to-r bg-[#0F172A]/90 rounded-2xl overflow-hidden border-white/10 shadow-2xl hover:border-amber-300 border-2 transition-all">
+                            <div
+                                className="cursor-pointer p-6 flex justify-between items-center hover:bg-white/5 transition-all"
+                                onClick={() => toggleMealCard('breakfast')}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">⏳</span>
+                                    <div>
+                                        <h3 className="text-white text-xl font-bold">
+                                            Breakfast: Coming Soon
+                                        </h3>
+                                        <div className="text-gray-400 text-sm">
+                                            We're working on adding breakfast options to our meal plans
+                                        </div>
+                                    </div>
+                                </div>
+                                <span className="text-yellow-500 text-2xl transition-transform duration-300">
+                                    {expandedMeals.breakfast ? '▲' : '▼'}
+                                </span>
+                            </div>
+
+                            <AnimatePresence>
+                                {expandedMeals.breakfast && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="px-6 pb-6 pt-2 border-t border-white/10">
+                                            <div className="flex flex-col md:flex-row gap-6">
+                                                <div className="flex-1">
+                                                    <div className="mb-4">
+                                                        <div className="text-gray-400 text-sm mb-2">Information</div>
+                                                        <div className="text-white text-lg font-semibold">Breakfast is coming soon!</div>
+                                                    </div>
+                                                    <p className="text-gray-300">
+                                                        We're currently developing a variety of nutritious breakfast options to complement your meal plan. 
+                                                        Stay tuned for delicious morning meals that will help you start your day right!
+                                                    </p>
+                                                </div>
+                                                <div className="shrink-0">
+                                                    <div className="w-40 h-32 rounded-xl bg-linear-to-br from-gray-700 to-gray-900 flex items-center justify-center text-gray-400 font-semibold">
+                                                        ⏳ Coming Soon
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-6 pt-4 border-t border-white/10">
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => {/* Notification signup functionality */ }}
+                                                        className="flex-1 py-3 rounded-2xl bg-linear-to-r from-gray-600 to-gray-700 text-white font-semibold hover:opacity-90 transition-all"
+                                                    >
+                                                        🔔 Notify Me
+                                                    </button>
+                                                    <button
+                                                        disabled={true}
+                                                        className="flex-1 py-3 rounded-2xl bg-linear-to-r from-gray-700 to-gray-800 text-gray-400 font-semibold cursor-not-allowed transition-all"
+                                                    >
+                                                        ⏳ Coming Soon
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
                         {/* Lunch Card */}
                         {selectedDayMeals?.lunch && (
-                            <div className="bg-linear-to-r from-[#1E293B]/90 to-[#0F172A]/90 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                                <div 
+                            <div className="bg-linear-to-r bg-[#0F172A]/90 rounded-2xl overflow-hidden border-white/10 shadow-2xl hover:border-amber-300 border-2 transition-all">
+                                <div
                                     className="cursor-pointer p-6 flex justify-between items-center hover:bg-white/5 transition-all"
                                     onClick={() => toggleMealCard('lunch')}
                                 >
@@ -510,8 +574,8 @@ const Tracker = () => {
                                                 Lunch: {selectedDayMeals.lunch.meal.name}
                                             </h3>
                                             <div className="text-gray-400 text-sm">
-                                                {deliveredMeals[`${selectedDayMeals.day}-lunch`] 
-                                                    ? "✓ Delivered - Counted in progress" 
+                                                {deliveredMeals[`${selectedDayMeals.day}-lunch`]
+                                                    ? "✓ Delivered - Counted in progress"
                                                     : "Not delivered yet - Not counted in progress"}
                                             </div>
                                         </div>
@@ -520,7 +584,7 @@ const Tracker = () => {
                                         {expandedMeals.lunch ? '▲' : '▼'}
                                     </span>
                                 </div>
-                                
+
                                 <AnimatePresence>
                                     {expandedMeals.lunch && (
                                         <motion.div
@@ -538,15 +602,15 @@ const Tracker = () => {
                                                             <div className="text-white text-lg font-semibold">{selectedDayMeals.lunch.meal.name}</div>
                                                         </div>
                                                         <ul className="space-y-2">
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Calories</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.lunch.meal.macros?.calories || 0} kcal</span>
                                                             </li>
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Protein</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.lunch.meal.macros?.protein || 0}g</span>
                                                             </li>
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Carbs</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.lunch.meal.macros?.carbs || 0}g</span>
                                                             </li>
@@ -562,23 +626,22 @@ const Tracker = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="mt-6 pt-4 border-t border-white/10">
                                                     <div className="flex gap-3">
-                                                        <button 
-                                                            onClick={() => {/* Rating functionality */}}
-                                                            className="flex-1 py-3 rounded-xl bg-linear-to-r from-gray-600 to-gray-700 text-white font-semibold hover:opacity-90 transition-all"
+                                                        <button
+                                                            onClick={() => {/* Rating functionality */ }}
+                                                            className="flex-1 py-3 rounded-2xl bg-linear-to-r from-[#6B7280] to-[#4B5563] text-white font-semibold hover:opacity-90 transition-all hover:shadow-lg shadow-gray-500/50 cursor-pointer hover:scale-105 transform"
                                                         >
                                                             ⭐ Rate Meal
                                                         </button>
                                                         <button
                                                             disabled={deliveredMeals[`${selectedDayMeals.day}-lunch`]}
                                                             onClick={() => openConfirmModal(selectedDayMeals.day, 'lunch')}
-                                                            className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                                                                deliveredMeals[`${selectedDayMeals.day}-lunch`]
-                                                                    ? 'bg-linear-to-r from-green-600 to-green-700 text-white cursor-not-allowed'
-                                                                    : 'bg-linear-to-r from-emerald-600 to-blue-600 text-white hover:opacity-90 cursor-pointer'
-                                                            }`}
+                                                            className={`flex-1 py-3 rounded-2xl font-semibold transition-all hover:shadow-lg ${deliveredMeals[`${selectedDayMeals.day}-lunch`]
+                                                                    ? 'bg-linear-to-r bg-emerald-500 text-white cursor-not-allowed shadow-emerald-500/50'
+                                                                    : 'bg-linear-to-r bg-emerald-500 text-white hover:opacity-90 cursor-pointer shadow-emerald-500/50'
+                                                                }`}
                                                         >
                                                             {deliveredMeals[`${selectedDayMeals.day}-lunch`] ? 'Delivered ✓' : '✔ Mark as Done'}
                                                         </button>
@@ -598,8 +661,8 @@ const Tracker = () => {
 
                         {/* Dinner Card */}
                         {selectedDayMeals?.dinner && (
-                            <div className="bg-linear-to-r from-[#1E293B]/90 to-[#0F172A]/90 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                                <div 
+                            <div className="bg-linear-to-r bg-[#0F172A]/90 rounded-2xl overflow-hidden border-white/10 shadow-2xl hover:border-amber-300 border-2 transition-all">
+                                <div
                                     className="cursor-pointer p-6 flex justify-between items-center hover:bg-white/5 transition-all"
                                     onClick={() => toggleMealCard('dinner')}
                                 >
@@ -610,8 +673,8 @@ const Tracker = () => {
                                                 Dinner: {selectedDayMeals.dinner.meal.name}
                                             </h3>
                                             <div className="text-gray-400 text-sm">
-                                                {deliveredMeals[`${selectedDayMeals.day}-dinner`] 
-                                                    ? "✓ Delivered - Counted in progress" 
+                                                {deliveredMeals[`${selectedDayMeals.day}-dinner`]
+                                                    ? "✓ Delivered - Counted in progress"
                                                     : "Not delivered yet - Not counted in progress"}
                                             </div>
                                         </div>
@@ -620,7 +683,7 @@ const Tracker = () => {
                                         {expandedMeals.dinner ? '▲' : '▼'}
                                     </span>
                                 </div>
-                                
+
                                 <AnimatePresence>
                                     {expandedMeals.dinner && (
                                         <motion.div
@@ -638,15 +701,15 @@ const Tracker = () => {
                                                             <div className="text-white text-lg font-semibold">{selectedDayMeals.dinner.meal.name}</div>
                                                         </div>
                                                         <ul className="space-y-2">
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Calories</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.dinner.meal.macros?.calories || 0} kcal</span>
                                                             </li>
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Protein</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.dinner.meal.macros?.protein || 0}g</span>
                                                             </li>
-                                                            <li className="flex justify-between items-center py-2 border-b border-white/10">
+                                                            <li className="flex justify-between items-center py-2 border-b border-amber-300/70">
                                                                 <span className="text-[#6EC1E4] font-semibold">Carbs</span>
                                                                 <span className="text-white font-bold">{selectedDayMeals.dinner.meal.macros?.carbs || 0}g</span>
                                                             </li>
@@ -662,23 +725,22 @@ const Tracker = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="mt-6 pt-4 border-t border-white/10">
                                                     <div className="flex gap-3">
-                                                        <button 
-                                                            onClick={() => {/* Rating functionality */}}
-                                                            className="flex-1 py-3 rounded-xl bg-linear-to-r from-gray-600 to-gray-700 text-white font-semibold hover:opacity-90 transition-all"
+                                                        <button
+                                                            onClick={() => {/* Rating functionality */ }}
+                                                            className="flex-1 py-3 rounded-2xl bg-linear-to-r from-[#6B7280] to-[#4B5563] text-white font-semibold hover:opacity-90 transition-all hover:shadow-lg shadow-gray-500/50 cursor-pointer"
                                                         >
                                                             ⭐ Rate Meal
                                                         </button>
                                                         <button
                                                             disabled={deliveredMeals[`${selectedDayMeals.day}-dinner`]}
                                                             onClick={() => openConfirmModal(selectedDayMeals.day, 'dinner')}
-                                                            className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
-                                                                deliveredMeals[`${selectedDayMeals.day}-dinner`]
-                                                                    ? 'bg-linear-to-r from-green-600 to-green-700 text-white cursor-not-allowed'
-                                                                    : 'bg-linear-to-r from-emerald-600 to-blue-600 text-white hover:opacity-90 cursor-pointer'
-                                                            }`}
+                                                            className={`flex-1 py-3 rounded-2xl font-semibold transition-all hover:shadow-lg ${deliveredMeals[`${selectedDayMeals.day}-dinner`]
+                                                                    ? 'bg-linear-to-r bg-emerald-500 text-white cursor-not-allowed shadow-emerald-500/50'
+                                                                    : 'bg-linear-to-r bg-emerald-500 text-white hover:opacity-90 cursor-pointer shadow-emerald-500/50'
+                                                                }`}
                                                         >
                                                             {deliveredMeals[`${selectedDayMeals.day}-dinner`] ? 'Delivered ✓' : '✔ Mark as Done'}
                                                         </button>
@@ -712,27 +774,26 @@ const Tracker = () => {
                         <button
                             onClick={() => handleDayChange('prev')}
                             disabled={selectedDay <= 1}
-                            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                                selectedDay <= 1
+                            className={`px-6 py-3 rounded-xl font-semibold transition-all ${selectedDay <= 1
                                     ? 'bg-white/10 text-gray-400 cursor-not-allowed'
                                     : 'bg-white/20 text-white hover:bg-white/30 cursor-pointer'
-                            }`}
+                                }`}
                         >
                             ← Previous Day
                         </button>
                         <button
                             onClick={() => handleDayChange('next')}
                             disabled={selectedDay >= totalPlanDays}
-                            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                                selectedDay >= totalPlanDays
+                            className={`px-6 py-3 rounded-xl font-semibold transition-all ${selectedDay >= totalPlanDays
                                     ? 'bg-white/10 text-gray-400 cursor-not-allowed'
                                     : 'bg-linear-to-r from-emerald-600 to-blue-600 text-white hover:opacity-90 cursor-pointer'
-                            }`}
+                                }`}
                         >
                             {selectedDay >= totalPlanDays ? 'Plan Complete!' : 'Next Day →'}
                         </button>
                     </div>
                 </div>
+
             </div>
 
             {/* =========================
@@ -796,7 +857,9 @@ const Tracker = () => {
                     onClose={() => setCustomizationOpen(false)}
                     subscriptionId={subscription?._id}
                 />
+
             </AnimatePresence>
+
         </>
     );
 };
