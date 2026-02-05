@@ -4,8 +4,6 @@ import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
 import CustomizationModal from "../components/CustomizationModal";
-import SubscriptionPage from "../components/SubscriptionPage";
-import TrackerPage from "../components/TrackerPage";
 
 const Tracker = () => {
     /* =========================
