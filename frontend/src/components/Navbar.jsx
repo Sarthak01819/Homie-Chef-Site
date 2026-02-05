@@ -13,6 +13,8 @@ import {
   History,
   BadgeCheck,
   Heart,
+  Clock,
+  HandPlatter,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
@@ -83,6 +85,7 @@ const Navbar = () => {
             <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
             <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
             <NavItem to="/tracker" icon={<BadgeCheck size={18} />} text="Track" />
+            <NavItem to="/order" icon={<HandPlatter size={18} />} text="Order" />
           </div>
         </div>
 

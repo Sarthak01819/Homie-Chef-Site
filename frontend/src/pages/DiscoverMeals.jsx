@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ErrorState from "../components/ErrorState";
+import SubscriptionThaliCard from "../components/SubscriptionThaliCard"; // Import the new component
 
 /* =========================
    STAR RATING COMPONENT
@@ -238,6 +239,78 @@ const MealCard = memo(({ meal }) => {
 });
 
 /* =========================
+   BREAKFAST COMING SOON CARD
+========================= */
+const BreakfastComingSoonCard = memo(() => {
+  return (
+    <motion.div
+      className="
+        rounded-2xl shadow-2xl overflow-hidden border-2
+        bg-linear-to-br from-[#FFF8E1] to-[#F5F5F5]
+        border-yellow-300
+        w-full mb-8
+      "
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="bg-linear-to-r from-amber-400 to-yellow-400 p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="text-4xl">⏳</span>
+            <div>
+              <h3 className="text-white text-2xl font-bold">
+                Breakfast Coming Soon!
+              </h3>
+              <p className="text-white/90">We're preparing delicious breakfast options for your subscription</p>
+            </div>
+          </div>
+          <button
+            onClick={() => toast.success("We'll notify you when breakfast is available!")}
+            className="px-6 py-3 rounded-xl bg-white text-amber-600 font-bold hover:bg-white/90 transition-colors"
+          >
+            🔔 Notify Me
+          </button>
+        </div>
+      </div>
+      
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-gray-800 font-bold text-lg mb-3">What to Expect</h4>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-gray-700">
+                <span className="text-green-500">✓</span>
+                Healthy breakfast options
+              </li>
+              <li className="flex items-center gap-2 text-gray-700">
+                <span className="text-green-500">✓</span>
+                Traditional Indian breakfast items
+              </li>
+              <li className="flex items-center gap-2 text-gray-700">
+                <span className="text-green-500">✓</span>
+                Balanced nutrition
+              </li>
+              <li className="flex items-center gap-2 text-gray-700">
+                <span className="text-green-500">✓</span>
+                Fresh daily delivery
+              </li>
+            </ul>
+          </div>
+          <div className="bg-linear-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+            <h4 className="text-amber-800 font-bold text-lg mb-2">Estimated Features</h4>
+            <p className="text-amber-700 text-sm">
+              Breakfast thali will include items like Poha, Upma, Idli, Dosa, Paratha, 
+              along with fruits, juice, and hot beverages.
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+});
+
+/* =========================
    MAIN PAGE
 ========================= */
 const DiscoverMeals = () => {
@@ -245,6 +318,38 @@ const DiscoverMeals = () => {
   const [filter, setFilter] = useState("lunch");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [currentDayOfSubscription, setCurrentDayOfSubscription] = useState(1);
+
+  // Fetch subscription data
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/subscriptions/my`,
+          { credentials: "include" }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setSubscription(data || null);
+          
+          // Calculate current day of subscription
+          if (data && data.startDate) {
+            const start = new Date(data.startDate);
+            const today = new Date();
+            const day = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+            setCurrentDayOfSubscription(day > 0 ? day : 1);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch subscription", error);
+        setSubscription(null);
+      }
+    };
+
+    fetchSubscription();
+  }, []);
 
   const fetchMeals = useCallback(async () => {
     try {
@@ -328,6 +433,33 @@ const DiscoverMeals = () => {
             </button>
           ))}
         </div>
+
+        {/* Subscription Thali Display - Only shown if user has active subscription */}
+        {subscription && (
+          <>
+            {filter === "breakfast" ? (
+              <BreakfastComingSoonCard />
+            ) : filter === "lunch" || filter === "dinner" ? (
+              <SubscriptionThaliCard 
+                mealType={filter}
+                day={currentDayOfSubscription}
+                mealData={subscription}
+              />
+            ) : null}
+            
+            {/* Separator */}
+            {filter !== "breakfast" && (
+              <div className="mb-10 pt-8 border-t border-gray-300/30">
+                <h2 className="text-2xl font-bold text-center mb-2" style={{ color: '#235E3A' }}>
+                  Additional Meals Available
+                </h2>
+                <p className="text-center text-gray-600 mb-6">
+                  Explore more meals to add to your cart beyond your subscription
+                </p>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Meals Grid or Coming Soon Message */}
         {filter === "breakfast" ? (
