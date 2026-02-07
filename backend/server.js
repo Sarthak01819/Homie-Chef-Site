@@ -139,6 +139,17 @@ if (IS_PROD) {
   });
 }
 
+if (IS_PROD) {
+  const clientPath = path.join(__dirname, "public");
+
+  app.use(express.static(clientPath));
+
+  // SPA fallback (MUST be last route)
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientPath, "index.html"));
+  });
+}
+
 
 /* =========================
    FRONTEND SERVE (PRODUCTION)
