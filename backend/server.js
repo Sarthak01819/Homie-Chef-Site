@@ -150,9 +150,10 @@ if (IS_PROD) {
     if (
       req.path.startsWith("/auth") ||
       req.path.startsWith("/admin") ||
-      req.path.startsWith("/meals") ||
-      req.path.startsWith("/orders") ||
-      req.path.startsWith("/subscriptions") ||
+      req.path.startsWith("/discover-meals") ||
+      req.path.startsWith("/order") ||
+      req.path.startsWith("/subscription") ||
+      req.path.startsWith("/tracker") ||
       req.path.startsWith("/payments") ||
       req.path.startsWith("/health")
     ) {
