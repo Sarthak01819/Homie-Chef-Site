@@ -57,7 +57,6 @@ export const loginLimiter = rateLimit({
     message: "Too many login attempts. Please try again later.",
   },
   keyGenerator: (req) => {
-    // email-based limiting first, IP fallback (IPv6 safe)
     return (
       req.body?.email?.toLowerCase() ||
       ipKeyGenerator(req)

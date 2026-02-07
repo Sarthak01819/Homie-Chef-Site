@@ -103,7 +103,7 @@ app.use(apiLimiter);
 /* =========================
    ROUTES
 ========================= */
-app.use("/auth", authLimiter, authRoutes);
+app.use("/auth", authRoutes);
 app.use("/meals", mealRoutes);
 app.use("/orders", orderRoutes);
 app.use("/subscriptions", subscriptionRoutes);
@@ -127,13 +127,22 @@ app.get("/health", (_, res) => {
 /* =========================
    FRONTEND SERVE (PRODUCTION)
 ========================= */
-if (IS_PROD) {
-  app.use(express.static(path.join(__dirname, "public")));
+app.use((req, res, next) => {
+  if (
+    req.path.startsWith("/auth") ||
+    req.path.startsWith("/admin") ||
+    req.path.startsWith("/meals") ||
+    req.path.startsWith("/orders") ||
+    req.path.startsWith("/subscriptions") ||
+    req.path.startsWith("/payments") ||
+    req.path.startsWith("/health")
+  ) {
+    return next();
+  }
 
-  app.get(/^(?!\/api|\/auth|\/admin).*/, (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-  });
-}
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 
 /* =========================
    ERROR HANDLER

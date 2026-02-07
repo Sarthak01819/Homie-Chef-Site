@@ -98,7 +98,7 @@ router.post("/register", async (req, res) => {
 /* =========================
    LOGIN (WITH ROTATION SETUP)
 ========================= */
-router.post("/login",loginLimiter, authLimiter,async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
     const { email, password } = req.body;
 
     try {
