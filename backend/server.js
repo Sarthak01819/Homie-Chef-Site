@@ -125,6 +125,22 @@ app.get("/health", (_, res) => {
 });
 
 /* =========================
+   FRONTEND SERVE (PRODUCTION SPA FIX)
+========================= */
+if (IS_PROD) {
+  const frontendPath = path.join(__dirname, "public");
+
+  // Serve static assets
+  app.use(express.static(frontendPath));
+
+  // SPA fallback — VERY IMPORTANT
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  });
+}
+
+
+/* =========================
    FRONTEND SERVE (PRODUCTION)
 ========================= */
 if (IS_PROD) {
