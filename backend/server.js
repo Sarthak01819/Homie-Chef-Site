@@ -150,15 +150,16 @@ if (IS_PROD) {
   });
 }
 
-
 /* =========================
-   FRONTEND SERVE (PRODUCTION)
+   FRONTEND SERVE (SPA FIX)
 ========================= */
 if (IS_PROD) {
   app.use(express.static(path.join(__dirname, "public")));
 
-  app.get("*", (req, res, next) => {
+  // ✅ SPA fallback (Express v5 SAFE)
+  app.use((req, res, next) => {
     if (
+      req.method !== "GET" ||
       req.path.startsWith("/auth") ||
       req.path.startsWith("/admin") ||
       req.path.startsWith("/meals") ||
@@ -173,8 +174,6 @@ if (IS_PROD) {
     res.sendFile(path.join(__dirname, "public", "index.html"));
   });
 }
-
-
 
 /* =========================
    ERROR HANDLER

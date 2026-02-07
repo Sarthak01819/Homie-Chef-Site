@@ -2351,3 +2351,11 @@
 {"level":"info","message":"GET /meals 304 - - 1386.798 ms","timestamp":"2026-02-07T08:20:35.399Z"}
 {"level":"info","message":"GET /subscriptions/my 304 - - 2742.150 ms","timestamp":"2026-02-07T08:20:36.571Z"}
 {"level":"info","message":"GET /subscriptions/my 304 - - 1165.573 ms","timestamp":"2026-02-07T08:20:37.741Z"}
+{"level":"info","message":"GET /subscriptions/my 401 52 - 80.810 ms","timestamp":"2026-02-07T10:32:25.471Z"}
+{"level":"info","message":"GET /auth/me 401 4 - 11.260 ms","timestamp":"2026-02-07T10:32:25.543Z"}
+{"level":"info","message":"GET /subscriptions/my 401 52 - 5.046 ms","timestamp":"2026-02-07T10:32:25.562Z"}
+{"level":"info","message":"GET /auth/me 401 4 - 7.222 ms","timestamp":"2026-02-07T10:32:25.577Z"}
+{"level":"info","message":"GET /meals 304 - - 571.330 ms","timestamp":"2026-02-07T10:32:25.718Z"}
+{"level":"info","message":"GET /meals 304 - - 172.607 ms","timestamp":"2026-02-07T10:32:25.912Z"}
+{"level":"info","message":"GET /subscriptions 304 - - 273.130 ms","timestamp":"2026-02-07T10:32:30.826Z"}
+{"level":"info","message":"GET /subscriptions 304 - - 212.563 ms","timestamp":"2026-02-07T10:32:31.047Z"}
