@@ -127,21 +127,26 @@ app.get("/health", (_, res) => {
 /* =========================
    FRONTEND SERVE (PRODUCTION)
 ========================= */
-app.use((req, res, next) => {
-  if (
-    req.path.startsWith("/auth") ||
-    req.path.startsWith("/admin") ||
-    req.path.startsWith("/meals") ||
-    req.path.startsWith("/orders") ||
-    req.path.startsWith("/subscriptions") ||
-    req.path.startsWith("/payments") ||
-    req.path.startsWith("/health")
-  ) {
-    return next();
-  }
+if (IS_PROD) {
+  app.use(express.static(path.join(__dirname, "public")));
 
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+  app.get("*", (req, res, next) => {
+    if (
+      req.path.startsWith("/auth") ||
+      req.path.startsWith("/admin") ||
+      req.path.startsWith("/meals") ||
+      req.path.startsWith("/orders") ||
+      req.path.startsWith("/subscriptions") ||
+      req.path.startsWith("/payments") ||
+      req.path.startsWith("/health")
+    ) {
+      return next();
+    }
+
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  });
+}
+
 
 
 /* =========================

@@ -7,11 +7,11 @@ import { sendEmail } from "../utils/sendEmail.js";
 import { generateCsrfToken } from "../middleware/csrf.js";
 import { logAudit } from "../utils/logAudit.js";
 import {
-  authLimiter,
-  refreshLimiter,
-  passwordLimiter,
-  adminAuthLimiter,
-  loginLimiter,
+    authLimiter,
+    refreshLimiter,
+    passwordLimiter,
+    adminAuthLimiter,
+    loginLimiter,
 } from "../middleware/rateLimiters.js";
 
 const router = express.Router();
@@ -20,19 +20,34 @@ const IS_PROD = process.env.APP_MODE === "production";
 /* =========================
    COOKIE OPTIONS (SECURE)
 ========================= */
+// const userCookieOptions = {
+//     httpOnly: true,
+//     secure: IS_PROD,
+//     sameSite: IS_PROD ? "none" : "lax",
+//     path: "/", // 👈 user scope
+// };
+
 const userCookieOptions = {
     httpOnly: true,
-    secure: IS_PROD,
-    sameSite: IS_PROD ? "none" : "lax",
-    path: "/", // 👈 user scope
+    secure: true,              // 🔥 FORCE
+    sameSite: "none",          // 🔥 FORCE
+    path: "/",
 };
+
+// const adminCookieOptions = {
+//     httpOnly: true,
+//     secure: IS_PROD,
+//     sameSite: IS_PROD ? "none" : "lax",
+//     path: "/", // 👈 admin isolation
+// };
 
 const adminCookieOptions = {
     httpOnly: true,
-    secure: IS_PROD,
-    sameSite: IS_PROD ? "none" : "lax",
-    path: "/", // 👈 admin isolation
+    secure: true,
+    sameSite: "none",
+    path: "/",
 };
+
 
 /* =========================
    EMAIL VERIFICATION
@@ -721,7 +736,7 @@ router.post("/admin/logout", async (req, res) => {
 
     res.clearCookie("admin_token", adminCookieOptions);
     res.clearCookie("admin_refreshToken", adminCookieOptions);
-    
+
     res.json({ message: "Admin logged out" });
 });
 
