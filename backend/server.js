@@ -104,14 +104,10 @@ app.use(apiLimiter);
    ROUTES
 ========================= */
 app.use("/auth", authRoutes);
-app.use("/discover-meals", mealRoutes);
-app.use("/order", orderRoutes);
+app.use("/meals", mealRoutes);
 app.use("/orders", orderRoutes);
-app.use("/subscription", subscriptionRoutes);
+app.use("/subscriptions", subscriptionRoutes);
 app.use("/payments", paymentRoutes);
-app.use("/tracker", paymentRoutes);
-app.use("/profile", paymentRoutes);
-app.use("/active-subscription", paymentRoutes);
 
 app.use("/admin/analytics", adminAnalyticsRoutes);
 app.use("/admin/controls", adminLimiter, adminControlsRoutes);
@@ -154,14 +150,10 @@ if (IS_PROD) {
     if (
       req.path.startsWith("/auth") ||
       req.path.startsWith("/admin") ||
-      req.path.startsWith("/discover-meals") ||
+      req.path.startsWith("/meals") ||
       req.path.startsWith("/orders") ||
-      req.path.startsWith("/order") ||
-      req.path.startsWith("/subscription") ||
-      req.path.startsWith("/tracker") ||
+      req.path.startsWith("/subscriptions") ||
       req.path.startsWith("/payments") ||
-      req.path.startsWith("/profile") ||
-      req.path.startsWith("/active-subscription") ||
       req.path.startsWith("/health")
     ) {
       return next();
