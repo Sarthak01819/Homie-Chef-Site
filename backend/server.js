@@ -125,32 +125,6 @@ app.get("/health", (_, res) => {
 });
 
 /* =========================
-   FRONTEND SERVE (PRODUCTION SPA FIX)
-========================= */
-if (IS_PROD) {
-  const frontendPath = path.join(__dirname, "public");
-
-  // Serve static assets
-  app.use(express.static(frontendPath));
-
-  // SPA fallback — VERY IMPORTANT
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
-  });
-}
-
-if (IS_PROD) {
-  const clientPath = path.join(__dirname, "public");
-
-  app.use(express.static(clientPath));
-
-  // SPA fallback (MUST be last route)
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(clientPath, "index.html"));
-  });
-}
-
-/* =========================
    FRONTEND SERVE (SPA FIX)
 ========================= */
 if (IS_PROD) {
