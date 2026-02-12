@@ -85,7 +85,7 @@ const Navbar = () => {
             <NavItem to="/discover-meals" icon={<Salad size={18} />} text="Discover" />
             <NavItem to="/subscription" icon={<CalendarFold size={18} />} text="Subscription" />
             <NavItem to="/tracker" icon={<BadgeCheck size={18} />} text="Track" />
-            <NavItem to="/order" icon={<HandPlatter size={18} />} text="Order" />
+            <NavItem to="/orders" icon={<HandPlatter size={18} />} text="Order" />
           </div>
         </div>
 

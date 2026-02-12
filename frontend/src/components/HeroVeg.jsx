@@ -37,8 +37,8 @@ const HeroVeg = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-            <span>Welcome to</span><br /><span className="text-[7vw] uppercase leading-14">Home Chef</span>
+          <h2 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight w-full">
+            <span className="uppercase ml-4">The</span><br /><span className="text-[7vw] uppercase leading-18">Homie Chef</span>
           </h2>
 
           <p className="text-lg md:text-xl text-white/90 mb-8">

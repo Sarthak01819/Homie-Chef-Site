@@ -27,6 +27,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import Tracker from "./pages/Tracker";
+import NotFound from "./pages/NotFound.jsx";
 
 /* =========================
    PAGE ANIMATION CONFIG
@@ -216,6 +217,16 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="*"
+          element={
+            <AnimatedPage>
+              <NotFound />
+            </AnimatedPage>
+          }
+        />
+
       </Routes>
     </AnimatePresence>
   );
