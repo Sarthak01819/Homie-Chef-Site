@@ -135,7 +135,7 @@ if (IS_PROD) {
     if (
       req.method !== "GET" ||
       req.path.startsWith("/auth") ||
-      req.path.startsWith("/admin") ||
+    //  req.path.startsWith("/admin") ||    this breaks admin routes, so we handle them serparately 
       req.path.startsWith("/meals") ||
       req.path.startsWith("/orders") ||
       req.path.startsWith("/subscriptions") ||
