@@ -103,21 +103,21 @@ app.use(apiLimiter);
 /* =========================
    ROUTES
 ========================= */
-app.use("/auth", authRoutes);
-app.use("/meals", mealRoutes);
-app.use("/orders", orderRoutes);
-app.use("/subscriptions", subscriptionRoutes);
-app.use("/payments", paymentRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/meals", mealRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/payments", paymentRoutes);
 
-app.use("/admin/analytics", adminAnalyticsRoutes);
-app.use("/admin/controls", adminLimiter, adminControlsRoutes);
-app.use("/admin/realtime", adminRealtimeRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/admin/analytics", adminAnalyticsRoutes);
+app.use("/api/admin/controls", adminLimiter, adminControlsRoutes);
+app.use("/api/admin/realtime", adminRealtimeRoutes);
+app.use("/api/admin", adminRoutes);
 
 /* =========================
    HEALTH CHECK
 ========================= */
-app.get("/health", (_, res) => {
+app.get("/api/health", (_, res) => {
   res.json({
     status: "OK",
     time: new Date().toISOString(),
@@ -130,22 +130,16 @@ app.get("/health", (_, res) => {
 if (IS_PROD) {
   app.use(express.static(path.join(__dirname, "public")));
 
-  // ✅ SPA fallback (Express v5 SAFE)
+  // ✅ SPA fallback for all GET requests not prefixed with /api
   app.use((req, res, next) => {
-    if (
-      req.method !== "GET" ||
-      req.path.startsWith("/auth") ||
-    //  req.path.startsWith("/admin") ||    this breaks admin routes, so we handle them serparately 
-      req.path.startsWith("/meals") ||
-      req.path.startsWith("/orders") ||
-      req.path.startsWith("/subscriptions") ||
-      req.path.startsWith("/payments") ||
-      req.path.startsWith("/health")
-    ) {
-      return next();
+    // If it's a GET request and the path does NOT start with '/api'
+    if (req.method === "GET" && !req.path.startsWith("/api")) {
+      res.sendFile(path.join(__dirname, "public", "index.html"));
+    } else {
+      // For all other requests (POST, PUT, DELETE, or GET to /api),
+      // continue to the next middleware (which will be your API routes or the 404 handler)
+      next();
     }
-
-    res.sendFile(path.join(__dirname, "public", "index.html"));
   });
 }
 
