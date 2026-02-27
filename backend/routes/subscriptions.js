@@ -33,6 +33,7 @@ router.get("/my", protect, async (req, res) => {
         const subscription = await UserSubscription.findOne({
             user: req.userId,
             status: "active",
+            endDate: { $gt: new Date() },   // 🔥 KEY LINE
         }).populate({
             path: "plan",
             populate: [
@@ -40,7 +41,6 @@ router.get("/my", protect, async (req, res) => {
                 { path: "mealsByDay.dinner.meal", model: "Meal" },
             ],
         });
-
 
         res.json(subscription || null);
     } catch (err) {
@@ -125,9 +125,10 @@ router.post("/subscribe", protect, async (req, res) => {
         }
 
         const existing = await UserSubscription.findOne({
-            user: req.userId,
-            status: "active",
-        });
+    user: req.userId,
+    status: "active",
+    endDate: { $gt: new Date() },   // 🔥 ADD THIS
+});
 
         if (existing) {
             return res.status(409).json({
