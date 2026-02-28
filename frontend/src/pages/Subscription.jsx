@@ -60,16 +60,7 @@ const Subscription = () => {
         console.log("Fetched plans:", data);
         setPlans(Array.isArray(data) ? data : []);
         
-        // Set default selected plan if exists
-        const savedPlan = localStorage.getItem('homieChefSelectedPlan');
-        if (savedPlan) {
-          const parsedPlan = JSON.parse(savedPlan);
-          // Find the matching plan from fetched plans
-          const matchedPlan = Array.isArray(data) ? data.find(p => p._id === parsedPlan._id) : null;
-          if (matchedPlan) {
-            setSelectedPlan(matchedPlan);
-          }
-        }
+        
       } catch (err) {
         console.error("Error fetching plans:", err);
         setError(err);
@@ -176,7 +167,7 @@ const Subscription = () => {
             toast.success("Subscription activated 🎉");
             setMySubscription(verifyData.subscription);
             setSelectedPlan(null);
-            localStorage.removeItem('homieChefSelectedPlan');
+            
           } catch {
             toast.error("Verification failed");
             setPaying(false);
@@ -202,7 +193,7 @@ const Subscription = () => {
 
   const handleSelectPlan = (plan) => {
     setSelectedPlan(plan);
-    localStorage.setItem('homieChefSelectedPlan', JSON.stringify(plan));
+    
     
     // Scroll to plan summary
     setTimeout(() => {
