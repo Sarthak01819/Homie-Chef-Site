@@ -30,11 +30,11 @@ const meals = [
     macros: { calories: 280, protein: 14, carbs: 30, fats: 8 },
   },
   {
-    name: "Chole Bhature",
+    name: "Dal Fry",
     category: "veg",
     price: 219,
-    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950",
-    macros: { calories: 450, protein: 16, carbs: 48, fats: 20 },
+    image: "https://i.pinimg.com/1200x/b3/37/2a/b3372ab36f06dde5ce9cdd9039a18c26.jpg",
+    macros: { calories: 450, protein: 15, carbs: 25, fats: 8 },
   },
   {
     name: "Rajma Rice",
